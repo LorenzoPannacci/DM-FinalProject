@@ -82,6 +82,9 @@ def main_bubble_sort(arr, callback):
                 a[j], a[j + 1] = a[j + 1], a[j]
                 record(a, [j, j + 1])
 
+    # remove highlight
+    record(a)
+
     callback(steps)
 
 
@@ -105,6 +108,9 @@ def main_insertion_sort(arr, callback):
             record(a, [j + 1, j + 2])
         a[j + 1] = key
         record(a, [j + 1])
+
+    # remove highlight
+    record(a)
 
     callback(steps)
 
