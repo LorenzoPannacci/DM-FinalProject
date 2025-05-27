@@ -2,10 +2,11 @@
 <html>
 
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Sorting Algorithms Visualizer</title>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.5/brython.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.5/brython_stdlib.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -26,10 +27,54 @@
     #container {
       margin: 20px auto;
       position: relative;
-      height: 300px;
+      height: 320px;
       width: 100%;
-      max-width: 800px;
+      max-width: 900px;
       border: 1px solid #ccc;
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      box-sizing: border-box;
+      background: white;
+    }
+
+    /* Sections: Secondary Memory and Buffer */
+    .section {
+      display: flex;
+      flex-direction: column;
+      width: 48%;
+      border: 1px solid #ccc;
+      padding: 10px;
+      box-sizing: border-box;
+      background: #fafafa;
+      border-radius: 8px;
+      overflow-y: auto;
+      height: 300px;
+    }
+
+    .section-title {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #00796b;
+      color: #00796b;
+    }
+
+    .array-container {
+      position: relative;
+      height: 120px;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+
+    .array-label {
+      position: relative;
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 5px;
+      text-align: left;
+      color: #004d40;
     }
 
     .bar {
@@ -38,6 +83,7 @@
       width: 20px;
       background-color: #4CAF50;
       transition: left 0.3s ease, height 0.3s ease, background-color 0.2s;
+      border-radius: 3px 3px 0 0;
     }
   </style>
 </head>

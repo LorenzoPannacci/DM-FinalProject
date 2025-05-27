@@ -119,15 +119,69 @@ def main_insertion_sort(arr, callback):
 # SECONDARY MEMORY SORTING #
 ############################
 
-def create_bars(arr):
+def create_bars(arr, pages, frames):
     """
     Create bars for external sorting.
     """
 
-    # TODO
 
-    return
+    container = document["container"]
+    container.clear()
 
+    # === Helper to create a titled section ===
+    def create_section(title_text, content_elements):
+        section = html.DIV(Class="section")
+        title = html.H3(title_text, Class="section-title")
+        section <= title
+        for elem in content_elements:
+            section <= elem
+        return section
+
+    # === Render a single array as bars with a label ===
+    def render_array(arr, label, base_id):
+        max_val = max(arr) if arr else 1
+        array_container = html.DIV(Class="array-container")
+        array_label = html.DIV(label, Class="array-label")
+        array_container <= array_label
+
+        for i, val in enumerate(arr):
+            height = (val / max_val) * bar_max_height
+            bar = html.DIV(
+                Class="bar",
+                style={
+                    "height": f"{height}px",
+                    "left": f"{i * (bar_width + bar_spacing)}px"
+                },
+                id=f"{base_id}-bar-{i}"
+            )
+            array_container <= bar
+
+        return array_container
+
+    # === Secondary Memory (Pages) ===
+    secondary_elements = []
+    for i, page in enumerate(pages):
+        label = f"Page {i}"
+        section = render_array(page, label, f"page-{i}")
+        secondary_elements.append(section)
+
+    secondary_memory_section = create_section("Secondary Memory", secondary_elements)
+
+    # === Buffer (Frames) ===
+    buffer_elements = []
+    for i, frame in enumerate(frames):
+        label = f"Frame {i}"
+        section = render_array(frame, label, f"frame-{i}")
+        buffer_elements.append(section)
+
+    buffer_section = create_section("Buffer", buffer_elements)
+
+    # === Overall Layout ===
+    layout = html.DIV(Class="layout")
+    layout <= secondary_memory_section
+    layout <= buffer_section
+
+    container <= layout
 def update_bars(arr, highlight=[]):
     """
     Update bars for external sorting
@@ -239,7 +293,7 @@ def on_sort_trigger(ev):
 
     elif method == "k-way":
         # create objects
-        create_bars(arr)
+        create_bars(arr, 6, 3)
         k_way_merge_sort(arr, 4, animate)
 
 document.bind("start_sort", on_sort_trigger)
