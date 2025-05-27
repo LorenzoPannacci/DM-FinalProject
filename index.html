@@ -243,8 +243,8 @@
             wrapper.style.marginTop = "10px"; // same vertical spacing as <br><br>
 
             const label = document.createElement("label");
-            label.innerText = `Page ${i + 1}:`;
-            container.appendChild(label);
+            label.innerText = `Page ${i + 1} contents:`;
+            wrapper.appendChild(label);
 
             const input = document.createElement("input");
             input.type = "text";
@@ -254,14 +254,16 @@
                 validateIntegerList(this);
             };
             wrapper.appendChild(document.createElement("br"));
-            container.appendChild(input);
+            wrapper.appendChild(input);
 
             const span = document.createElement("span");
             span.className = "warning";
             span.id = `page_${i + 1}Warning`;
             span.innerText = "Please enter only comma-separated integers.";
             wrapper.appendChild(document.createElement("br"));
-            container.appendChild(span);
+            wrapper.appendChild(span);
+
+            container.appendChild(wrapper);
         }
     }
   </script>
