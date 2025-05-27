@@ -1,36 +1,70 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
-  <title>Sorting Algorithm Visualizer</title>
+  <title>Sorting Algorithms Visualizer</title>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.5/brython.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.5/brython_stdlib.js"></script>
   <style>
-    body { font-family: Arial; text-align: center; }
-    .bar {
-      display: inline-block;
-      margin: 1px;
-      background-color: #4CAF50;
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #e0f7fa; /* light blue background */
+      margin: 0;
+      padding: 0;
     }
-    #container { margin-top: 20px; height: 300px; }
+
+    h2 {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin-top: 30px;
+      color: #00796b; /* deep teal */
+      text-shadow: 1px 1px 2px #b2dfdb;
+    }
+
+    #container {
+      margin: 20px auto;
+      position: relative;
+      height: 300px;
+      width: 100%;
+      max-width: 800px;
+      border: 1px solid #ccc;
+    }
+
+    .bar {
+      position: absolute;
+      bottom: 0;
+      width: 20px;
+      background-color: #4CAF50;
+      transition: left 0.3s ease, height 0.3s ease, background-color 0.2s;
+    }
   </style>
 </head>
-<body onload="brython()">
+
+<body onload="brython()"> /* interface with python */
   <h2>Sorting Algorithm Visualizer</h2>
+
   <input type="text" id="arrayInput" placeholder="Enter numbers e.g. 5,3,8,6">
+  
   <select id="sortMethod">
     <option value="bubble">Bubble Sort</option>
     <option value="insertion">Insertion Sort</option>
     <option value="k-way">K-Way</option>
   </select>
+
   <button onclick="run_sort()">Run</button>
+
   <div id="container"></div>
 
-  <script type="text/python" src="sort_anim.py"></script>
+  <script type="text/python" src="sort_anim.py"></script> /* javascript script to run python function */
+  
   <script type="text/javascript">
     function run_sort() {
       document.dispatchEvent(new Event("start_sort"));
     }
   </script>
+
 </body>
+
 </html>
