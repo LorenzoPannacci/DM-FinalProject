@@ -139,6 +139,10 @@ def create_bars(arr, pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0
     # === Render a single array as bars with a label ===
     def render_array(arr, label, base_id):
         max_val = max(arr) if arr else 1
+
+        if max_val == 0: # handle "empty" array
+            max_val = 1
+
         array_container = html.DIV(Class="array-container")
         array_label = html.DIV(label, Class="array-label")
         array_container <= array_label
