@@ -131,7 +131,7 @@
 
       <div id="arrayInputFields">
         <label for="arrayInput">Input array:</label><br>
-        <input type="text" id="arrayInput" placeholder="Enter numbers e.g. 5,3,8,6" oninput="validateIntegerList(this)"><br>
+        <input type="text" id="arrayInput" placeholder="Enter comma-separated integers" oninput="validateIntegerList(this)"><br>
         <span class="warning" id="arrayInputWarning">Please enter only comma-separated integers.<br></span><br>
       </div>
 
@@ -147,6 +147,8 @@
         <label for="elements_per_page">Elements per page/frame:</label><br>
         <input type="text" id="elements_per_page" placeholder="e.g. 8" oninput="validateInteger(this)"><br>
         <span class="warning" id="elements_per_pageWarning">Please enter a valid integer.<br></span><br>
+
+        <div id="pageInputsContainer"></div>
       </div>
 
       <button onclick="run_sort()">Run</button>
@@ -171,51 +173,93 @@
     }
 
     function updateInputVisibility() {
-      const method = document.getElementById("sortMethod").value;
-      const arrayInputFields = document.getElementById("arrayInputFields");
-      const kWayFields = document.getElementById("kWayFields");
+        const method = document.getElementById("sortMethod").value;
+        const arrayInputFields = document.getElementById("arrayInputFields");
+        const kWayFields = document.getElementById("kWayFields");
 
-      if (method === "k-way") {
-        arrayInputFields.style.display = "none";
-        kWayFields.style.display = "block";
-      } else {
-        arrayInputFields.style.display = "block";
-        kWayFields.style.display = "none";
-      }
+        if (method === "k-way") {
+            arrayInputFields.style.display = "none";
+            kWayFields.style.display = "block";
+        } else {
+            arrayInputFields.style.display = "block";
+            kWayFields.style.display = "none";
+        }
     }
 
     function validateInteger(input) {
-      const value = input.value.trim();
-      const isValid = /^-?\d+$/.test(value);
-      const warning = document.getElementById(input.id + "Warning");
+        const value = input.value.trim();
+        const isValid = /^-?\d+$/.test(value);
+        const warning = document.getElementById(input.id + "Warning");
 
-      if (value === "") {
-        input.style.borderColor = "";
-        warning.style.display = "none";
-      } else if (!isValid) {
-        input.style.borderColor = "red";
-        warning.style.display = "inline";
-      } else {
-        input.style.borderColor = "";
-        warning.style.display = "none";
-      }
+        if (value === "") {
+            input.style.borderColor = "";
+            warning.style.display = "none";
+        } else if (!isValid) {
+            input.style.borderColor = "red";
+            warning.style.display = "inline";
+        } else {
+            input.style.borderColor = "";
+            warning.style.display = "none";
+
+            if (input.id === "n_pages") {
+            updatePageInputs();
+            }
+        }
     }
 
     function validateIntegerList(input) {
-      const value = input.value.trim();
-      const isValid = value.split(',').every(num => /^-?\d+$/.test(num.trim()));
-      const warning = document.getElementById(input.id + "Warning");
+        const value = input.value.trim();
+        const isValid = value.split(',').every(num => /^-?\d+$/.test(num.trim()));
+        const warning = document.getElementById(input.id + "Warning");
 
-      if (value === "") {
-        input.style.borderColor = "";
-        warning.style.display = "none";
-      } else if (!isValid) {
-        input.style.borderColor = "red";
-        warning.style.display = "inline";
-      } else {
-        input.style.borderColor = "";
-        warning.style.display = "none";
-      }
+        if (value === "") {
+            input.style.borderColor = "";
+            warning.style.display = "none";
+        } else if (!isValid) {
+            input.style.borderColor = "red";
+            warning.style.display = "inline";
+        } else {
+            input.style.borderColor = "";
+            warning.style.display = "none";
+        }
+    }
+
+    function updatePageInputs() {
+        const nPagesInput = document.getElementById("n_pages");
+        const container = document.getElementById("pageInputsContainer");
+        const warning = document.getElementById("n_pagesWarning");
+
+        // Clear existing inputs
+        container.innerHTML = "";
+
+        const value = nPagesInput.value.trim();
+        const isValid = /^-?\d+$/.test(value);
+        const nPages = parseInt(value);
+
+        if (value === "" || !isValid || nPages <= 0) return;
+
+        for (let i = 0; i < nPages; i++) {
+            const label = document.createElement("label");
+            label.innerText = `Page ${i + 1} content:`;
+            container.appendChild(label);
+
+            const input = document.createElement("input");
+            input.type = "text";
+            input.placeholder = "Enter comma-separated integers";
+            input.id = `page_${i + 1}`;
+            input.oninput = function () {
+            validateIntegerList(this);
+            };
+            container.appendChild(input);
+
+            const span = document.createElement("span");
+            span.className = "warning";
+            span.id = `page_${i + 1}Warning`;
+            span.innerText = "Please enter only comma-separated integers.";
+            container.appendChild(span);
+
+            container.appendChild(document.createElement("br"));
+        }
     }
   </script>
 </body>
