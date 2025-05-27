@@ -246,7 +246,7 @@
         const isValid = /^-?\d+$/.test(value);
         const nPages = parseInt(value);
 
-        if (value === "" || !isValid || nPages <= 0 || manualCheckbox.checked) return;
+        if (value === "" || !isValid || nPages <= 0 || !manualCheckbox.checked) return;
 
         // Insert a light gray divider line before inputs
         const divider = document.createElement("hr");
