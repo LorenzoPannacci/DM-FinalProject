@@ -177,19 +177,37 @@
     }
 
     function validateInteger(input) {
-      const isValid = /^-?\d+$/.test(input.value.trim());
+      const value = input.value.trim();
+      const isValid = /^-?\d+$/.test(value);
       const warning = document.getElementById(input.id + "Warning");
 
-      input.style.borderColor = isValid || input.value === "" ? "" : "red";
-      warning.style.display = isValid || input.value === "" ? "none" : "inline";
+      if (value === "") {
+        input.style.borderColor = "";
+        warning.style.display = "none";
+      } else if (!isValid) {
+        input.style.borderColor = "red";
+        warning.style.display = "inline";
+      } else {
+        input.style.borderColor = "";
+        warning.style.display = "none";
+      }
     }
 
     function validateIntegerList(input) {
-      const isValid = input.value.trim() === "" || input.value.trim().split(',').every(num => /^-?\d+$/.test(num.trim()));
+      const value = input.value.trim();
+      const isValid = value.split(',').every(num => /^-?\d+$/.test(num.trim()));
       const warning = document.getElementById(input.id + "Warning");
 
-      input.style.borderColor = isValid ? "" : "red";
-      warning.style.display = isValid ? "none" : "inline";
+      if (value === "") {
+        input.style.borderColor = "";
+        warning.style.display = "none";
+      } else if (!isValid) {
+        input.style.borderColor = "red";
+        warning.style.display = "inline";
+      } else {
+        input.style.borderColor = "";
+        warning.style.display = "none";
+      }
     }
   </script>
 </body>
