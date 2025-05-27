@@ -168,8 +168,8 @@ def create_bars(arr, pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0
     # === Secondary Memory (Pages) ===
     secondary_elements = []
     for i, page in enumerate(pages):
-        label = f"Page {i}"
-        section = render_array(page, label, f"page-{i}")
+        label = f"Page {i+1}"
+        section = render_array(page, label, f"page-{i+1}")
         secondary_elements.append(section)
 
     secondary_memory_section = create_section("Secondary Memory", secondary_elements, secondary_height)
@@ -177,8 +177,8 @@ def create_bars(arr, pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0
     # === Buffer (Frames) ===
     buffer_elements = []
     for i, frame in enumerate(frames):
-        label = f"Frame {i}"
-        section = render_array(frame, label, f"frame-{i}")
+        label = f"Frame {i+1}"
+        section = render_array(frame, label, f"frame-{i+1}")
         buffer_elements.append(section)
 
     buffer_section = create_section("Buffer", buffer_elements, buffer_height)
