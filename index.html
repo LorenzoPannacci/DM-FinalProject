@@ -191,14 +191,7 @@
         const isValid = /^-?\d+$/.test(value);
         const warning = document.getElementById(input.id + "Warning");
 
-        if (value === "") {
-            input.style.borderColor = "";
-            warning.style.display = "none";
-
-            if (input.id === "n_pages") {
-            updatePageInputs();
-            }
-        } else if (!isValid) {
+        if (!isValid) {
             input.style.borderColor = "red";
             warning.style.display = "inline";
         } else {
@@ -207,7 +200,6 @@
 
             if (input.id === "n_pages") {
             updatePageInputs();
-            }
         }
     }
 
