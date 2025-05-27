@@ -131,7 +131,7 @@
 
       <div id="arrayInputFields">
         <label for="arrayInput">Input array:</label><br>
-        <input type="text" id="arrayInput" placeholder="Enter comma-separated integers" oninput="validateIntegerList(this)"><br>
+        <input type="text" id="arrayInput" placeholder="Enter numbers e.g. 5,3,8,6" oninput="validateIntegerList(this)"><br>
         <span class="warning" id="arrayInputWarning">Please enter only comma-separated integers.<br></span><br>
       </div>
 
@@ -240,22 +240,24 @@
 
         for (let i = 0; i < nPages; i++) {
             const label = document.createElement("label");
-            label.innerText = `Page ${i + 1} content:`;
+            label.innerText = `Page ${i + 1}:`;
             container.appendChild(label);
 
             const input = document.createElement("input");
             input.type = "text";
-            input.placeholder = "Enter comma-separated integers";
+            input.placeholder = "Enter numbers e.g. 5,3,8,6";
             input.id = `page_${i + 1}`;
             input.oninput = function () {
-            validateIntegerList(this);
+                validateIntegerList(this);
             };
+            wrapper.appendChild(document.createElement("br"));
             container.appendChild(input);
 
             const span = document.createElement("span");
             span.className = "warning";
             span.id = `page_${i + 1}Warning`;
-            span.innerText = "Please enter only comma-separated integers.";
+            span.innerText = "Please enter only comma-separated integers.<br>";
+            wrapper.appendChild(document.createElement("br"));
             container.appendChild(span);
 
             container.appendChild(document.createElement("br"));
