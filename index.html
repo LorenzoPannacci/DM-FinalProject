@@ -25,30 +25,32 @@
     }
 
     #container {
-      margin: 20px auto;
-      position: relative;
-      height: 640px;
-      width: 900px;
-      border: 1px solid #ccc;
-      display: flex;
-      justify-content: space-between;
-      padding: 10px;
-      box-sizing: border-box;
-      background: white;
+    margin: 20px auto;
+    position: relative;
+    height: 320px;
+    width: 100%;
+    max-width: 900px;
+    border: 1px solid #ccc;
+    display: flex;
+    flex-direction: row; /* ensures left-to-right */
+    justify-content: space-between;
+    padding: 10px;
+    box-sizing: border-box;
+    background: white;
+    align-items: flex-start; /* aligns top edges */
     }
 
-    /* Sections: Secondary Memory and Buffer */
     .section {
-      display: flex;
-      flex-direction: column;
-      width: 900px;
-      border: 1px solid #ccc;
-      padding: 10px;
-      box-sizing: border-box;
-      background: #fafafa;
-      border-radius: 8px;
-      overflow-y: auto;
-      height: 300px;
+    display: flex;
+    flex-direction: column;
+    width: 48%; /* ensures both fit side by side */
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-sizing: border-box;
+    background: #fafafa;
+    border-radius: 8px;
+    overflow-y: auto;
+    height: 300px;
     }
 
     .section-title {
