@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Sorting Algorithm Visualizer</title>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.5/brython.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.5/brython_stdlib.js"></script>
+  <style>
+    body { font-family: Arial; text-align: center; }
+    .bar {
+      display: inline-block;
+      margin: 1px;
+      background-color: #4CAF50;
+    }
+    #container { margin-top: 20px; height: 300px; }
+  </style>
+</head>
+<body onload="brython()">
+  <h2>Sorting Algorithm Visualizer</h2>
+  <input type="text" id="arrayInput" placeholder="Enter numbers e.g. 5,3,8,6">
+  <select id="sortMethod">
+    <option value="bubble">Bubble Sort</option>
+    <option value="insertion">Insertion Sort</option>
+  </select>
+  <button onclick="run_sort()">Run</button>
+  <div id="container"></div>
+
+  <script type="text/python" src="sort_anim.py"></script>
+  <script type="text/javascript">
+    function run_sort() {
+      document.dispatchEvent(new Event("start_sort"));
+    }
+  </script>
+</body>
+</html>
