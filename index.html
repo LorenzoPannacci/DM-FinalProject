@@ -194,6 +194,10 @@
         if (value === "") {
             input.style.borderColor = "";
             warning.style.display = "none";
+
+            if (input.id === "n_pages") {
+            updatePageInputs();
+            }
         } else if (!isValid) {
             input.style.borderColor = "red";
             warning.style.display = "inline";
@@ -234,7 +238,7 @@
 
         const value = nPagesInput.value.trim();
         console.log("nPagesInput value:", value);
-        
+
         const isValid = /^-?\d+$/.test(value);
         const nPages = parseInt(value);
 
