@@ -128,8 +128,13 @@ def create_bars(arr, pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0
     container.clear()
 
     # === Helper to create a titled section ===
-    def create_section(title_text, content_elements):
-        section = html.DIV(Class="section")
+
+    height_per_block = 130
+    secondary_height = max(len(pages) * height_per_block, 300)
+    buffer_height = max(len(frames) * height_per_block, 300)
+
+    def create_section(title_text, content_elements, height_px):
+        section = html.DIV(Class="section", style={"height": f"{height_px}px"})
         title = html.H3(title_text, Class="section-title")
         section <= title
         for elem in content_elements:
@@ -168,7 +173,7 @@ def create_bars(arr, pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0
         section = render_array(page, label, f"page-{i}")
         secondary_elements.append(section)
 
-    secondary_memory_section = create_section("Secondary Memory", secondary_elements)
+    secondary_memory_section = create_section("Secondary Memory", secondary_elements, secondary_height)
 
     # === Buffer (Frames) ===
     buffer_elements = []
@@ -177,7 +182,7 @@ def create_bars(arr, pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0
         section = render_array(frame, label, f"frame-{i}")
         buffer_elements.append(section)
 
-    buffer_section = create_section("Buffer", buffer_elements)
+    buffer_section = create_section("Buffer", buffer_elements, buffer_height)
 
     # === Overall Layout ===
     layout = html.DIV(Class="layout")
@@ -186,7 +191,7 @@ def create_bars(arr, pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0
 
     container <= layout
 
-    
+
 def update_bars(arr, highlight=[]):
     """
     Update bars for external sorting
