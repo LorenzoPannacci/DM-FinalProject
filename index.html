@@ -21,11 +21,12 @@
   <select id="sortMethod">
     <option value="bubble">Bubble Sort</option>
     <option value="insertion">Insertion Sort</option>
+    <option value="k-way">Insertion Sort</option>
   </select>
   <button onclick="run_sort()">Run</button>
   <div id="container"></div>
 
-  <script type="text/python" src="sort_anim_kway.py"></script>
+  <script type="text/python" src="sort_anim.py"></script>
   <script type="text/javascript">
     function run_sort() {
       document.dispatchEvent(new Event("start_sort"));

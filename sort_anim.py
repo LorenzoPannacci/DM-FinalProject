@@ -1,4 +1,5 @@
 from browser import document, html, timer
+import heapq
 
 def create_bars(arr):
     container = document["container"]
@@ -51,6 +52,38 @@ def insertion_sort(arr, callback):
 
     callback(steps)
 
+def k_way_merge_sort(arr, k, callback):
+    if not arr:
+        callback([])
+        return
+
+    steps = []
+
+    def record(a):
+        steps.append(a[:])
+
+    n = len(arr)
+    chunk_size = (n + k - 1) // k  # ceil division
+    sorted_chunks = [sorted(arr[i*chunk_size:(i+1)*chunk_size]) for i in range(k)]
+    heap = []
+    pointers = [0] * k
+
+    for i in range(k):
+        if pointers[i] < len(sorted_chunks[i]):
+            heapq.heappush(heap, (sorted_chunks[i][0], i))
+
+    result = []
+
+    while heap:
+        val, i = heapq.heappop(heap)
+        result.append(val)
+        record(result + sum([sorted_chunks[j][pointers[j]:] for j in range(k)], []))
+        pointers[i] += 1
+        if pointers[i] < len(sorted_chunks[i]):
+            heapq.heappush(heap, (sorted_chunks[i][pointers[i]], i))
+
+    callback(steps)
+
 def animate(steps):
     i = 0
     def update():
@@ -77,5 +110,7 @@ def on_sort_trigger(ev):
         bubble_sort(arr, animate)
     elif method == "insertion":
         insertion_sort(arr, animate)
+    elif method == "k-way":
+        k_way_merge_sort(arr, 4, animate)
 
 document.bind("start_sort", on_sort_trigger)
