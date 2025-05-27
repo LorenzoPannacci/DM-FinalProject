@@ -292,7 +292,7 @@ def on_sort_trigger(ev):
 
     elif method == "k-way":
         # create objects
-        create_bars(arr, 6, 3)
+        create_bars(arr)
         k_way_merge_sort(arr, 4, animate)
 
 document.bind("start_sort", on_sort_trigger)
