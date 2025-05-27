@@ -97,6 +97,39 @@ def k_way_merge_sort(arr, k, callback):
 
     callback(steps)
 
+def my_k_way_merge_sort(arr, k, n, callback):
+    """
+    arr: original data
+    k: number of frames in main memory dedicated to input
+    n: amount of elements per page
+    """
+
+    # initialize step memory
+    steps = []
+
+    # define step recording
+    def record(a):
+        steps.append(a[:])
+
+    # divide original data in pages
+    pages = []
+    current_page = []
+
+    for elem in arr:
+        if len(current_page) < n:
+            current_page.append(elem)
+        else:
+            pages.append(current_page)
+            current_page = []
+
+    # step 0: sort within pages
+
+    for i in range(len(pages)):
+        pages[i] = sorted(pages[i])
+
+
+    callback(steps)
+
 def animate(steps):
     i = 0
     def update():
@@ -107,7 +140,7 @@ def animate(steps):
             i += 1
         else:
             timer.clear_interval(interval_id)
-    interval_id = timer.set_interval(update, 300)
+    interval_id = timer.set_interval(update, 500)
 
 def on_sort_trigger(ev):
     raw = document["arrayInput"].value
