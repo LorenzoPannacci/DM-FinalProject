@@ -283,26 +283,29 @@ def k_way_merge_sort(arr, k, n, callback):
 ###############
 
 def on_sort_trigger(ev):
-    raw = document["arrayInput"].value
-    try:
-        arr = list(map(int, raw.strip().split(',')))
-    except:
-        alert("Invalid input. Please enter comma-separated integers.")
-        return
-
     method = document["sortMethod"].value
 
-    if method == "bubble":
-        main_create_bars(arr)
-        main_bubble_sort(arr, main_animate)
-
-    elif method == "insertion":
-        main_create_bars(arr)
-        main_insertion_sort(arr, main_animate)
-
-    elif method == "k-way":
+    if method == "k-way":
         # create objects
         create_bars()
         k_way_merge_sort(arr, 4, animate)
+    
+    else:
+        raw = document["arrayInput"].value
+        try:
+            arr = list(map(int, raw.strip().split(',')))
+        except:
+            alert("Invalid input. Please enter comma-separated integers.")
+            return
+
+        if method == "bubble":
+            main_create_bars(arr)
+            main_bubble_sort(arr, main_animate)
+
+        elif method == "insertion":
+            main_create_bars(arr)
+            main_insertion_sort(arr, main_animate)
+
+
 
 document.bind("start_sort", on_sort_trigger)
