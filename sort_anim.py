@@ -3,6 +3,7 @@ from browser import document, html, timer, alert
 bar_width = 20
 bar_spacing = 5
 bar_max_height = 100
+height_per_block = 150
 
 #######################
 # MAIN MEMORY SORTING #
@@ -128,8 +129,6 @@ def create_bars(arr, pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0
     container.clear()
 
     # === Helper to create a titled section ===
-
-    height_per_block = 130
     secondary_height = max(len(pages) * height_per_block, 300)
     buffer_height = max(len(frames) * height_per_block, 300)
 
