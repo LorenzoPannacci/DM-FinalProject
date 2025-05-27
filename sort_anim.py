@@ -185,6 +185,8 @@ def create_bars(arr, pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0
     layout <= buffer_section
 
     container <= layout
+
+    
 def update_bars(arr, highlight=[]):
     """
     Update bars for external sorting
