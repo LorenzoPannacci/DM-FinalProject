@@ -235,6 +235,7 @@
         const nPagesInput = document.getElementById("n_pages");
         const container = document.getElementById("pageInputsContainer");
         const warning = document.getElementById("n_pagesWarning");
+        const manualCheckbox = document.getElementById("manual_populate");
 
         // Clear existing inputs
         container.innerHTML = "";
@@ -245,7 +246,7 @@
         const isValid = /^-?\d+$/.test(value);
         const nPages = parseInt(value);
 
-        if (value === "" || !isValid || nPages <= 0) return;
+        if (value === "" || !isValid || nPages <= 0 || manualCheckbox.checked) return;
 
         // Insert a light gray divider line before inputs
         const divider = document.createElement("hr");
