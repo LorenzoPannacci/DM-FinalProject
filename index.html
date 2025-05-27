@@ -96,39 +96,57 @@
   </style>
 </head>
 
-<body onload="brython()">
+<body onload="brython(); updateInputVisibility();">
   <h2>Sorting Algorithm Visualizer</h2>
 
-  <label for="n_pages">Number of pages:</label>
-  <input type="text" id="n_pages" placeholder="e.g. 6">
-
-  <label for="n_frames">Number of frames:</label>
-  <input type="text" id="n_frames" placeholder="e.g. 3 (2-way-sort)">
-
-  <label for="elements_per_page">Elements per page/frame:</label>
-  <input type="text" id="elements_per_page" placeholder="e.g. 8">
-
-  <label for="arrayInput">Input array:</label>
-  <input type="text" id="arrayInput" placeholder="Enter numbers e.g. 5,3,8,6">
-  
-  <select id="sortMethod">
+  <label for="sortMethod">Sorting method:</label>
+  <select id="sortMethod" onchange="updateInputVisibility()">
     <option value="bubble">Bubble Sort</option>
     <option value="insertion">Insertion Sort</option>
     <option value="k-way">K-Way</option>
   </select>
+
+  <div id="arrayInputFields">
+    <label for="arrayInput">Input array:</label>
+    <input type="text" id="arrayInput" placeholder="Enter numbers e.g. 5,3,8,6">
+  </div>
+
+  <div id="kWayFields" style="display: none;">
+    <label for="n_pages">Number of pages:</label><br>
+    <input type="text" id="n_pages" placeholder="e.g. 6"><br><br>
+
+    <label for="n_frames">Number of frames:</label><br>
+    <input type="text" id="n_frames" placeholder="e.g. 3 (2-way-sort)"><br><br>
+
+    <label for="elements_per_page">Elements per page/frame:</label><br>
+    <input type="text" id="elements_per_page" placeholder="e.g. 8"><br><br>
+  </div>
 
   <button onclick="run_sort()">Run</button>
 
   <div id="container"></div>
 
   <script type="text/python" src="sort_anim.py"></script>
-  
+
   <script type="text/javascript">
     function run_sort() {
       document.dispatchEvent(new Event("start_sort"));
     }
-  </script>
 
+    function updateInputVisibility() {
+      const method = document.getElementById("sortMethod").value;
+      const arrayInputFields = document.getElementById("arrayInputFields");
+      const kWayFields = document.getElementById("kWayFields");
+
+      if (method === "k-way") {
+        arrayInputFields.style.display = "none";
+        kWayFields.style.display = "block";
+      } else {
+        arrayInputFields.style.display = "block";
+        kWayFields.style.display = "none";
+      }
+    }
+  </script>
 </body>
 
 </html>
