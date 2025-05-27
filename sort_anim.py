@@ -119,11 +119,10 @@ def main_insertion_sort(arr, callback):
 # SECONDARY MEMORY SORTING #
 ############################
 
-def create_bars(arr, pages, frames):
+def create_bars(arr, pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0,0,0,0],[0,0,0,0],[0,0,0,0]]):
     """
     Create bars for external sorting.
     """
-
 
     container = document["container"]
     container.clear()
