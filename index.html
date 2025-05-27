@@ -239,6 +239,9 @@
         if (value === "" || !isValid || nPages <= 0) return;
 
         for (let i = 0; i < nPages; i++) {
+            const wrapper = document.createElement("div");
+            wrapper.style.marginTop = "10px"; // same vertical spacing as <br><br>
+
             const label = document.createElement("label");
             label.innerText = `Page ${i + 1}:`;
             container.appendChild(label);
@@ -256,11 +259,9 @@
             const span = document.createElement("span");
             span.className = "warning";
             span.id = `page_${i + 1}Warning`;
-            span.innerText = "Please enter only comma-separated integers.<br>";
+            span.innerText = "Please enter only comma-separated integers.";
             wrapper.appendChild(document.createElement("br"));
             container.appendChild(span);
-
-            container.appendChild(document.createElement("br"));
         }
     }
   </script>
