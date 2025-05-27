@@ -1,13 +1,22 @@
 from browser import document, html, timer, alert
-import heapq
 
 bar_width = 20
 bar_spacing = 5
+bar_max_height = 100
 
-def create_bars(arr):
+#######################
+# MAIN MEMORY SORTING #
+#######################
+
+def main_create_bars(arr):
+    """
+    Create bars for main memory sorting.
+    """
+
     container = document["container"]
     container.clear()
     max_val = max(arr) if arr else 1
+
     for i, val in enumerate(arr):
         height = (val / max_val) * 300
         bar = html.DIV(
@@ -18,11 +27,18 @@ def create_bars(arr):
             },
             id=f"bar-{i}"
         )
+
         container <= bar
 
-def update_bars(arr, highlight=[]):
+
+def main_update_bars(arr, highlight=[]):
+    """
+    Update bars for main memory soring.
+    """
+
     max_val = max(arr) if arr else 1
     container = document["container"]
+
     for i, val in enumerate(arr):
         bar = container.children[i]
         height = (val / max_val) * 300
@@ -30,7 +46,29 @@ def update_bars(arr, highlight=[]):
         bar.style.height = f"{height}px"
         bar.style.backgroundColor = "#FF5733" if i in highlight else "#4CAF50"
 
-def bubble_sort(arr, callback):
+
+def main_animate(steps):
+    """
+    Script for animation for main memory sorting.
+    """
+
+    i = 0
+    def update():
+        nonlocal i
+        if i < len(steps):
+            state, highlight = steps[i]
+            main_update_bars(state, highlight)
+            i += 1
+        else:
+            timer.clear_interval(interval_id)
+    interval_id = timer.set_interval(update, 500)
+
+
+def main_bubble_sort(arr, callback):
+    """
+    Main memory Bubblesort
+    """
+
     steps = []
 
     def record(a, highlight=[]):
@@ -46,7 +84,12 @@ def bubble_sort(arr, callback):
 
     callback(steps)
 
-def insertion_sort(arr, callback):
+
+def main_insertion_sort(arr, callback):
+    """
+    Main memory insertion sort.
+    """
+
     steps = []
 
     def record(a, highlight=[]):
@@ -65,39 +108,41 @@ def insertion_sort(arr, callback):
 
     callback(steps)
 
-def k_way_merge_sort(arr, k, callback):
-    if not arr:
-        callback([])
-        return
 
-    steps = []
+############################
+# SECONDARY MEMORY SORTING #
+############################
 
-    def record(a):
-        steps.append(a[:])
+def create_bars(arr):
+    """
+    Create bars for external sorting.
+    """
 
-    n = len(arr)
-    chunk_size = (n + k - 1) // k  # ceil division
-    sorted_chunks = [sorted(arr[i*chunk_size:(i+1)*chunk_size]) for i in range(k)]
-    heap = []
-    pointers = [0] * k
+    # TODO
 
-    for i in range(k):
-        if pointers[i] < len(sorted_chunks[i]):
-            heapq.heappush(heap, (sorted_chunks[i][0], i))
+    return
 
-    result = []
+def update_bars(arr, highlight=[]):
+    """
+    Update bars for external sorting
+    """
 
-    while heap:
-        val, i = heapq.heappop(heap)
-        result.append(val)
-        record(result + sum([sorted_chunks[j][pointers[j]:] for j in range(k)], []))
-        pointers[i] += 1
-        if pointers[i] < len(sorted_chunks[i]):
-            heapq.heappush(heap, (sorted_chunks[i][pointers[i]], i))
+    # TODO
 
-    callback(steps)
+    return
 
-def my_k_way_merge_sort(arr, k, n, callback):
+
+def animate(steps):
+    """
+    Script for animation for external sorting.
+    """
+
+    # TODO
+
+    return
+
+
+def k_way_merge_sort(arr, k, n, callback):
     """
     arr: original data
     k: number of frames in main memory dedicated to input
@@ -108,8 +153,18 @@ def my_k_way_merge_sort(arr, k, n, callback):
     steps = []
 
     # define step recording
-    def record(a):
-        steps.append(a[:])
+    def record(highlight=[]):
+        """
+        Structure of highlight is a tuple of two elements.
+
+        First is a dictionary that for each frame in the buffer says which element of
+        the frame to highlight.
+
+        Second is a dictionary that for each page in pages says which element of the page
+        to highlight.
+        """
+
+        steps.append((pages, buffer, highlight))
 
     # divide original data in pages
     pages = []
@@ -122,25 +177,41 @@ def my_k_way_merge_sort(arr, k, n, callback):
             pages.append(current_page)
             current_page = []
 
+    # initialize buffer
+    buffer = [[] for _ in range(k)]
+
+    # record initial state
+    record()
+
     # step 0: sort within pages
 
     for i in range(len(pages)):
-        pages[i] = sorted(pages[i])
+        # load page into buffer
+        buffer[0] = pages[i]
+        record(highlight=({0: "all"}, {i: "all"}))
 
+        # sort page in buffer (Bubblesort for visual clarity)
+        for i in range(buffer[0]):
+            for j in range(buffer[0] - i - 1):
+                if buffer[0][j] > buffer[0][j + 1]:
+                    buffer[0][j], buffer[0][j + 1] = buffer[0][j + 1], buffer[0][j]
+
+                    record(highlight=({0: (j, j+1)},{}))
+
+        # write back into page
+        pages[i] = buffer[0]
+        record(highlight=({0: "all"}, {i: "all"}))
+
+    # steps k: merge pages
+
+    # TODO
 
     callback(steps)
 
-def animate(steps):
-    i = 0
-    def update():
-        nonlocal i
-        if i < len(steps):
-            state, highlight = steps[i]
-            update_bars(state, highlight)
-            i += 1
-        else:
-            timer.clear_interval(interval_id)
-    interval_id = timer.set_interval(update, 500)
+
+###############
+# MAIN SCRIPT #
+###############
 
 def on_sort_trigger(ev):
     raw = document["arrayInput"].value
@@ -153,15 +224,16 @@ def on_sort_trigger(ev):
     method = document["sortMethod"].value
 
     if method == "bubble":
-        create_bars(arr)
-        bubble_sort(arr, animate)
+        main_create_bars(arr)
+        main_bubble_sort(arr, main_animate)
 
     elif method == "insertion":
-        create_bars(arr)
-        insertion_sort(arr, animate)
+        main_create_bars(arr)
+        main_insertion_sort(arr, main_animate)
 
     elif method == "k-way":
         # create objects
+        create_bars(arr)
         k_way_merge_sort(arr, 4, animate)
 
 document.bind("start_sort", on_sort_trigger)
