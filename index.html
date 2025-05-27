@@ -131,18 +131,22 @@
 
       <div id="arrayInputFields">
         <label for="arrayInput">Input array:</label><br>
-        <input type="text" id="arrayInput" placeholder="Enter numbers e.g. 5,3,8,6" oninput="validateIntegerList(this)"><br><br>
+        <input type="text" id="arrayInput" placeholder="Enter numbers e.g. 5,3,8,6" oninput="validateIntegerList(this)">
+        <span class="warning" id="arrayInputWarning">Please enter only comma-separated integers.</span><br><br>
       </div>
 
       <div id="kWayFields" style="display: none;">
         <label for="n_pages">Number of pages:</label><br>
-        <input type="text" id="n_pages" placeholder="e.g. 6" oninput="validateIntegerList(this)"><br><br>
+        <input type="text" id="n_pages" placeholder="e.g. 6" oninput="validateInteger(this)">
+        <span class="warning" id="n_pagesWarning">Please enter a valid integer.</span><br><br>
 
         <label for="n_frames">Number of frames:</label><br>
-        <input type="text" id="n_frames" placeholder="e.g. 3 (2-way-sort)" oninput="validateIntegerList(this)"><br><br>
+        <input type="text" id="n_frames" placeholder="e.g. 3 (2-way-sort)" oninput="validateInteger(this)">
+        <span class="warning" id="n_framesWarning">Please enter a valid integer.</span><br><br>
 
         <label for="elements_per_page">Elements per page/frame:</label><br>
-        <input type="text" id="elements_per_page" placeholder="e.g. 8" oninput="validateIntegerList(this)"><br><br>
+        <input type="text" id="elements_per_page" placeholder="e.g. 8" oninput="validateInteger(this)">
+        <span class="warning" id="elements_per_pageWarning">Please enter a valid integer.</span><br><br>
       </div>
 
       <button onclick="run_sort()">Run</button>
@@ -174,12 +178,18 @@
 
     function validateInteger(input) {
       const isValid = /^-?\d+$/.test(input.value.trim());
+      const warning = document.getElementById(input.id + "Warning");
+
       input.style.borderColor = isValid || input.value === "" ? "" : "red";
+      warning.style.display = isValid || input.value === "" ? "none" : "inline";
     }
 
     function validateIntegerList(input) {
       const isValid = input.value.trim() === "" || input.value.trim().split(',').every(num => /^-?\d+$/.test(num.trim()));
+      const warning = document.getElementById(input.id + "Warning");
+
       input.style.borderColor = isValid ? "" : "red";
+      warning.style.display = isValid ? "none" : "inline";
     }
   </script>
 </body>
