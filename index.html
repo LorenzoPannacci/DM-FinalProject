@@ -131,18 +131,18 @@
 
       <div id="arrayInputFields">
         <label for="arrayInput">Input array:</label><br>
-        <input type="text" id="arrayInput" placeholder="Enter numbers e.g. 5,3,8,6"><br><br>
+        <input type="text" id="arrayInput" placeholder="Enter numbers e.g. 5,3,8,6" oninput="validateIntegerList(this)"><br><br>
       </div>
 
       <div id="kWayFields" style="display: none;">
         <label for="n_pages">Number of pages:</label><br>
-        <input type="text" id="n_pages" placeholder="e.g. 6"><br><br>
+        <input type="text" id="n_pages" placeholder="e.g. 6" oninput="validateIntegerList(this)"><br><br>
 
         <label for="n_frames">Number of frames:</label><br>
-        <input type="text" id="n_frames" placeholder="e.g. 3 (2-way-sort)"><br><br>
+        <input type="text" id="n_frames" placeholder="e.g. 3 (2-way-sort)" oninput="validateIntegerList(this)"><br><br>
 
         <label for="elements_per_page">Elements per page/frame:</label><br>
-        <input type="text" id="elements_per_page" placeholder="e.g. 8"><br><br>
+        <input type="text" id="elements_per_page" placeholder="e.g. 8" oninput="validateIntegerList(this)"><br><br>
       </div>
 
       <button onclick="run_sort()">Run</button>
@@ -170,6 +170,16 @@
         arrayInputFields.style.display = "block";
         kWayFields.style.display = "none";
       }
+    }
+
+    function validateInteger(input) {
+      const isValid = /^-?\d+$/.test(input.value.trim());
+      input.style.borderColor = isValid || input.value === "" ? "" : "red";
+    }
+
+    function validateIntegerList(input) {
+      const isValid = input.value.trim() === "" || input.value.trim().split(',').every(num => /^-?\d+$/.test(num.trim()));
+      input.style.borderColor = isValid ? "" : "red";
     }
   </script>
 </body>
