@@ -120,7 +120,7 @@ def main_insertion_sort(arr, callback):
 # SECONDARY MEMORY SORTING #
 ############################
 
-def create_bars(arr, pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0,0,0,0],[0,0,0,0],[0,0,0,0]]):
+def create_bars(pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0,0,0,0],[0,0,0,0],[0,0,0,0]]):
     """
     Create bars for external sorting.
     """
@@ -302,7 +302,7 @@ def on_sort_trigger(ev):
 
     elif method == "k-way":
         # create objects
-        create_bars(arr)
+        create_bars()
         k_way_merge_sort(arr, 4, animate)
 
 document.bind("start_sort", on_sort_trigger)
