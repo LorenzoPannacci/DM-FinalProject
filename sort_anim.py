@@ -182,7 +182,7 @@ def create_bars(pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0,0,0,
     secondary_elements = []
     for i, page in enumerate(pages):
         label = f"Page {i+1}"
-        section = render_array(page, label, f"page-{i+1}")
+        section = render_array(page, label, f"page-{i}")
         secondary_elements.append(section)
 
     secondary_memory_section = create_section("Secondary Memory", secondary_elements, secondary_height)
@@ -191,7 +191,7 @@ def create_bars(pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0,0,0,
     buffer_elements = []
     for i, frame in enumerate(frames):
         label = f"Frame {i+1}"
-        section = render_array(frame, label, f"frame-{i+1}")
+        section = render_array(frame, label, f"frame-{i}")
         buffer_elements.append(section)
 
     buffer_section = create_section("Buffer", buffer_elements, buffer_height)
@@ -227,6 +227,7 @@ def preprocess_highlight(state, highlight):
                         expanded_highlight.add((sec, i, bar))
 
     return expanded_highlight
+
 
 def update_bars(state, highlight=set()):
     """
@@ -332,6 +333,8 @@ def k_way_merge_sort(pages, n_pages, n_frames, elements_per_page, callback):
     # steps k: merge pages
     # TODO
 
+    print("test")
+
     callback(steps)
 
 
@@ -360,7 +363,7 @@ def on_sort_trigger(ev):
 
         else:
             # get pages from fields
-
+            # TODO
             pages = [[1,2,3,4]]
 
         # create objects
