@@ -320,12 +320,12 @@ def on_sort_trigger(ev):
 
     if method == "k-way":
         # get data
-        n_pages = document["n_pages"].value
-        n_frames = document["n_frames"].value
-        elements_per_page = document["elements_per_page"].value
+        n_pages = int(document["n_pages"].value)
+        n_frames = int(document["n_frames"].value)
+        elements_per_page = int(document["elements_per_page"].value)
         manual_populate = document["manual_populate"].value
 
-        if not manual_populate == "on":
+        if not manual_populate.checked:
             # upper bound for random entry
             upper = n_pages * elements_per_page * 10
 
