@@ -240,6 +240,9 @@ def update_bars(state, highlight=set()):
 
     expanded_highlight = preprocess_highlight(state, highlight)
 
+    print(state)
+    print(expanded_highlight)
+
     for section, arrays in state.items():  # for each of 'pages' and 'frames'
         for i, arr in enumerate(arrays): # for each barplot of the section
         
@@ -332,8 +335,6 @@ def k_way_merge_sort(pages, n_pages, n_frames, elements_per_page, callback):
 
     # steps k: merge pages
     # TODO
-
-    print("test")
 
     callback(steps)
 
