@@ -17,8 +17,8 @@ def main_create_bars(arr):
     container = document["container"]
     container.clear()
 
-    container.background = "#fafafa"
-
+    # set the background color of the container
+    container.style["backgroundColor"] = "#fafafa"
 
     max_val = max(arr) if arr else 1
 
