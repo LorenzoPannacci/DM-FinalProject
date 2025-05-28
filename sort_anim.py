@@ -261,7 +261,6 @@ def update_bars(state, highlight=set()):
                     height = (val / max_val) * 100
                     bar.style.height = f"{height}px"
                     bar.style.backgroundColor = "#FF5733" if (section, i, j) in expanded_highlight else "#4CAF50"
-                    print((section, i, j))
 
 
 def animate(steps):
