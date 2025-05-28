@@ -5,7 +5,7 @@ import copy
 bar_width = 20
 bar_spacing = 5
 bar_max_height = 100
-height_per_block = 160
+height_per_block = 150
 
 #######################
 # MAIN MEMORY SORTING #
