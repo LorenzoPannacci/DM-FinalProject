@@ -277,12 +277,14 @@ def animate(steps):
             update_bars(state, highlight)
             i += 1
 
-        else:
-            timer.clear_interval(interval_id)
+            # read current speed
+            speed = int(document["speedRange"].value)
 
-    speed = int(document["speedRange"].value)
-    print(speed)
-    interval_id = timer.set_interval(update, speed)
+            # schedule next step
+            timer.set_timeout(update, speed)
+
+    # start animation
+    update()
 
 
 def k_way_merge_sort(pages, frames, n_pages, n_frames, elements_per_page, callback):
