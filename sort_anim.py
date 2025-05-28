@@ -1,5 +1,6 @@
 from browser import document, html, timer, alert
 import random
+import copy
 
 bar_width = 20
 bar_spacing = 5
@@ -129,7 +130,7 @@ def main_insertion_sort(arr, callback):
 # SECONDARY MEMORY SORTING #
 ############################
 
-def create_bars(pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0,0,0,0],[0,0,0,0],[0,0,0,0]]):
+def create_bars(pages, frames):
     """
     Create bars for external sorting.
     """
@@ -306,7 +307,10 @@ def k_way_merge_sort(pages, frames, n_pages, n_frames, elements_per_page, callba
         to highlight.
         """
 
-        steps.append(({"pages": pages, "frames": frames}, highlight))
+        pages_copy = copy.deepcopy(pages)
+        frames_copy = copy.deepcopy(frames)
+        steps.append(({"pages": pages_copy, "frames": frames_copy}, highlight.copy()))
+
 
     # record initial state
     record()
