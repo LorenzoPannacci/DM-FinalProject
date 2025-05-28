@@ -249,8 +249,6 @@ def update_bars(state, highlight=set()):
                 
                 # section[:-1] to get 'page' or 'frame'
                 bar_id = f"{section[:-1]}-{i}-bar-{j}"
-
-                print(bar_id)
                 
                 # get bar
                 bar = document.getElementById(bar_id)
@@ -259,7 +257,7 @@ def update_bars(state, highlight=set()):
                 if bar:
                     height = (val / max_val) * 100
                     bar.style.height = f"{height}px"
-                    bar.style.backgroundColor = ("#FF5733" if (section[:-1], i, j) in expanded_highlight else "steelblue")
+                    bar.style.backgroundColor = ("#FF5733" if (section[:-1], i, j) in expanded_highlight else "#4CAF50")
 
 
 def animate(steps):
