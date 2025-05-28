@@ -287,22 +287,22 @@ def k_way_merge_sort(pages, n_pages, n_frames, elements_per_page, callback):
 
     # step 0: sort within pages
 
-    for i in range(len(pages)):
+    for l in range(n_pages):
         # load page into buffer
-        buffer[0] = pages[i]
-        record(highlight=({0: "all"}, {i: "all"}))
+        buffer[0] = pages[l]
+        record(highlight=({0: "all"}, {l: "all"}))
 
         # sort page in buffer (Bubblesort for visual clarity)
-        for i in range(len(buffer[0])):
-            for j in range(len(buffer[0]) - i - 1):
+        for i in range(elements_per_page):
+            for j in range(elements_per_page - i - 1):
                 if buffer[0][j] > buffer[0][j + 1]:
                     buffer[0][j], buffer[0][j + 1] = buffer[0][j + 1], buffer[0][j]
 
                     record(highlight=({0: (j, j+1)},{}))
 
         # write back into page
-        pages[i] = buffer[0]
-        record(highlight=({0: "all"}, {i: "all"}))
+        pages[l] = buffer[0]
+        record(highlight=({0: "all"}, {l: "all"}))
 
     # steps k: merge pages
 
