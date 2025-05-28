@@ -204,6 +204,30 @@ def create_bars(pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0,0,0,
     container <= layout
 
 
+def preprocess_highlight(state, highlight):
+    """
+    Preprocess highlights to expand 'all' into actual indices
+    """
+
+    expanded_highlight = set()
+
+    for section, arrays in state.items():
+        for i, arr in enumerate(arrays):
+            for hl in highlight:
+                
+                sec, idx, bar = hl
+
+                if sec == section[:-1] and idx == i:
+                    
+                    if bar == "all":
+                        for j in range(len(arr)):
+                            expanded_highlight.add((sec, i, j))
+
+                    elif isinstance(bar, int):
+                        expanded_highlight.add((sec, i, bar))
+
+    return expanded_highlight
+
 def update_bars(state, highlight=set()):
     """
     Update bar heights and colors for external sorting visualization.
@@ -213,8 +237,9 @@ def update_bars(state, highlight=set()):
     - highlight: set of tuples (section, array_index, bar_index), e.g., ('page', 0, 2)
     """
 
-    for section, arrays in state.items():  # for each of 'pages' and 'frames'
+    expanded_highlight = preprocess_highlight(state, highlight)
 
+    for section, arrays in state.items():  # for each of 'pages' and 'frames'
         for i, arr in enumerate(arrays): # for each barplot of the section
         
             max_val = max(arr) if arr else 1
@@ -231,7 +256,7 @@ def update_bars(state, highlight=set()):
                 if bar:
                     height = (val / max_val) * 100
                     bar.style.height = f"{height}px"
-                    bar.style.backgroundColor = ("#FF5733" if (section[:-1], i, j) in highlight else "steelblue")
+                    bar.style.backgroundColor = ("#FF5733" if (section[:-1], i, j) in expanded_highlight else "steelblue")
 
 
 def animate(steps):
@@ -266,7 +291,7 @@ def k_way_merge_sort(pages, n_pages, n_frames, elements_per_page, callback):
     steps = []
 
     # initialize buffer
-    buffer = [[] for _ in range(n_frames)]
+    frames = [[] for _ in range(n_frames)]
 
     # define step recording
     def record(highlight=set()):
@@ -280,7 +305,7 @@ def k_way_merge_sort(pages, n_pages, n_frames, elements_per_page, callback):
         to highlight.
         """
 
-        steps.append(({"pages": pages, "buffer": buffer}, highlight))
+        steps.append(({"pages": pages, "frames": frames}, highlight))
 
     # record initial state
     record()
@@ -289,23 +314,22 @@ def k_way_merge_sort(pages, n_pages, n_frames, elements_per_page, callback):
 
     for l in range(n_pages):
         # load page into buffer
-        buffer[0] = pages[l]
-        record(highlight=({0: "all"}, {l: "all"}))
+        frames[0] = pages[l]
+        record(highlight=(("frames", 0, "all"), ("pages", l, "all")))
 
         # sort page in buffer (Bubblesort for visual clarity)
         for i in range(elements_per_page):
             for j in range(elements_per_page - i - 1):
-                if buffer[0][j] > buffer[0][j + 1]:
-                    buffer[0][j], buffer[0][j + 1] = buffer[0][j + 1], buffer[0][j]
+                if frames[0][j] > frames[0][j + 1]:
+                    frames[0][j], frames[0][j + 1] = frames[0][j + 1], frames[0][j]
 
-                    record(highlight=({0: (j, j+1)},{}))
+                    record(highlight=(("frames", 0, j), ("frames", 0, j+1)))
 
         # write back into page
-        pages[l] = buffer[0]
-        record(highlight=({0: "all"}, {l: "all"}))
+        pages[l] = frames[0]
+        record(highlight=(("frames", 0, "all"), ("pages", l, "all")))
 
     # steps k: merge pages
-
     # TODO
 
     callback(steps)
