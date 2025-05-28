@@ -281,7 +281,7 @@ def animate(steps):
     interval_id = timer.set_interval(update, 500)
 
 
-def k_way_merge_sort(pages, n_pages, n_frames, elements_per_page, callback):
+def k_way_merge_sort(pages, frames, n_pages, n_frames, elements_per_page, callback):
     """
     arr: original data
     k: number of frames in main memory dedicated to input
@@ -364,9 +364,12 @@ def on_sort_trigger(ev):
             # TODO
             pages = [[1,2,3,4]]
 
+        # initialize frames
+        frames = [[0] * elements_per_page] * n_frames
+
         # create objects
-        create_bars(pages)
-        k_way_merge_sort(pages, n_pages, n_frames, elements_per_page, animate)
+        create_bars(pages, frames)
+        k_way_merge_sort(pages, frames, n_pages, n_frames, elements_per_page, animate)
     
     else:
         raw = document["arrayInput"].value
