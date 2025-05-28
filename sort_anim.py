@@ -218,7 +218,7 @@ def preprocess_highlight(state, highlight):
                 
                 sec, idx, bar = hl
 
-                if sec == section[:-1] and idx == i:
+                if sec == section and idx == i:
                     
                     if bar == "all":
                         for j in range(len(arr)):
