@@ -240,9 +240,6 @@ def update_bars(state, highlight=set()):
 
     expanded_highlight = preprocess_highlight(state, highlight)
 
-    print(state)
-    print(expanded_highlight)
-
     for section, arrays in state.items():  # for each of 'pages' and 'frames'
         for i, arr in enumerate(arrays): # for each barplot of the section
         
@@ -252,6 +249,8 @@ def update_bars(state, highlight=set()):
                 
                 # section[:-1] to get 'page' or 'frame'
                 bar_id = f"{section[:-1]}-{i}-bar-{j}"
+
+                print(bar_id)
                 
                 # get bar
                 bar = document.get(bar_id)
