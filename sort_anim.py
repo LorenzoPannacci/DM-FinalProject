@@ -69,11 +69,14 @@ def main_animate(steps):
             main_update_bars(state, highlight)
             i += 1
 
-        else:
-            timer.clear_interval(interval_id)
+            # read current speed
+            speed = int(document["speedRange"].value)
 
-    speed = int(document["speedRange"].value)
-    interval_id = timer.set_interval(update, speed)
+            # schedule next step
+            timer.set_timeout(update, speed)
+
+    # start animation
+    update()
 
 
 def main_bubble_sort(arr, callback):
