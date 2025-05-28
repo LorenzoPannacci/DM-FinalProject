@@ -325,9 +325,7 @@ def on_sort_trigger(ev):
         elements_per_page = document["elements_per_page"].value
         manual_populate = document["manual_populate"].value
 
-        print(manual_populate)
-
-        if not manual_populate:
+        if not manual_populate == "on":
             # upper bound for random entry
             upper = n_pages * elements_per_page * 10
 
@@ -336,6 +334,11 @@ def on_sort_trigger(ev):
 
             for _ in range(n_pages):
                 pages.append([random.randint(1, upper) for _ in range(elements_per_page)])
+
+        else:
+            # get pages from fields
+
+            pages = [[1,2,3,4]]
 
         # create objects
         create_bars(pages)
