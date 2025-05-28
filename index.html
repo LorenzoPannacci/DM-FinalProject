@@ -158,6 +158,13 @@
       </div>
 
       <button onclick="run_sort()">Run</button>
+
+      <br>
+      <label for="speedRange">Animation Speed (ms):</label><br>
+      <input type="range" id="speedRange" min="10" max="1000" value="500" step="10" oninput="updateSpeedDisplay()">
+      <span id="speedValue">500 ms</span>
+      <br><br>
+
     </div>
 
     <div id="container"></div>

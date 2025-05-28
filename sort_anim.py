@@ -72,7 +72,8 @@ def main_animate(steps):
         else:
             timer.clear_interval(interval_id)
 
-    interval_id = timer.set_interval(update, 500)
+    speed = int(document["speedRange"].value)
+    interval_id = timer.set_interval(update, speed)
 
 
 def main_bubble_sort(arr, callback):
@@ -279,7 +280,8 @@ def animate(steps):
         else:
             timer.clear_interval(interval_id)
 
-    interval_id = timer.set_interval(update, 500)
+    speed = int(document["speedRange"].value)
+    interval_id = timer.set_interval(update, speed)
 
 
 def k_way_merge_sort(pages, frames, n_pages, n_frames, elements_per_page, callback):
@@ -393,7 +395,6 @@ def on_sort_trigger(ev):
         elif method == "insertion":
             main_create_bars(arr)
             main_insertion_sort(arr, main_animate)
-
 
 
 document.bind("start_sort", on_sort_trigger)
