@@ -309,7 +309,8 @@ def k_way_merge_sort(pages, frames, n_pages, n_frames, elements_per_page, callba
 
         pages_copy = copy.deepcopy(pages)
         frames_copy = copy.deepcopy(frames)
-        steps.append(({"pages": pages_copy, "frames": frames_copy}, highlight.copy()))
+        highlight_copy = copy.deepcopy(highlight)
+        steps.append(({"pages": pages_copy, "frames": frames_copy}, highlight_copy))
 
 
     # record initial state
@@ -319,7 +320,7 @@ def k_way_merge_sort(pages, frames, n_pages, n_frames, elements_per_page, callba
 
     for l in range(n_pages):
         # load page into buffer
-        frames[0] = pages[l]
+        frames[0] = copy.deepcopy(pages[l])
         record(highlight=(("frames", 0, "all"), ("pages", l, "all")))
 
         # sort page in buffer (Bubblesort for visual clarity)
@@ -331,7 +332,7 @@ def k_way_merge_sort(pages, frames, n_pages, n_frames, elements_per_page, callba
                     record(highlight=(("frames", 0, j), ("frames", 0, j+1)))
 
         # write back into page
-        pages[l] = frames[0]
+        pages[l] = copy.deepcopy(frames[0])
         record(highlight=(("frames", 0, "all"), ("pages", l, "all")))
 
     # steps k: merge pages
