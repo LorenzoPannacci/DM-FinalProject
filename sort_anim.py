@@ -335,6 +335,8 @@ def k_way_merge_sort(pages, frames, n_pages, n_frames, elements_per_page, callba
         pages[l] = copy.deepcopy(frames[0])
         record(highlight=(("frames", 0, "all"), ("pages", l, "all")))
 
+    record()
+
     # steps k: merge pages
     # TODO
 
