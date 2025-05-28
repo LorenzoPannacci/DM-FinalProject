@@ -325,6 +325,8 @@ def on_sort_trigger(ev):
         elements_per_page = document["elements_per_page"].value
         manual_populate = document["manual_populate"].value
 
+        print(manual_populate)
+
         if not manual_populate:
             # upper bound for random entry
             upper = n_pages * elements_per_page * 10
