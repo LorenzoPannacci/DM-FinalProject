@@ -1,4 +1,5 @@
 from browser import document, html, timer, alert
+import random
 
 bar_width = 20
 bar_spacing = 5
@@ -58,14 +59,18 @@ def main_animate(steps):
     """
 
     i = 0
+
     def update():
         nonlocal i
+
         if i < len(steps):
             state, highlight = steps[i]
             main_update_bars(state, highlight)
             i += 1
+
         else:
             timer.clear_interval(interval_id)
+
     interval_id = timer.set_interval(update, 500)
 
 
@@ -132,6 +137,9 @@ def create_bars(pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0,0,0,
     container = document["container"]
     container.clear()
 
+    # set the background color of the container
+    container.style["backgroundColor"] = "#e0f7fa"
+
     # helper to create a titled section
     secondary_height = max(len(pages) * height_per_block, 300)
     buffer_height = max(len(frames) * height_per_block, 300)
@@ -196,14 +204,34 @@ def create_bars(pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0,0,0,
     container <= layout
 
 
-def update_bars(arr, highlight=[]):
+def update_bars(state, highlight=set()):
     """
-    Update bars for external sorting
+    Update bar heights and colors for external sorting visualization.
+
+    Parameters:
+    - state: dict with keys 'pages' and 'frames', each a list of arrays
+    - highlight: set of tuples (section, array_index, bar_index), e.g., ('page', 0, 2)
     """
 
-    # TODO
+    for section, arrays in state.items():  # for each of 'pages' and 'frames'
 
-    return
+        for i, arr in enumerate(arrays): # for each barplot of the section
+        
+            max_val = max(arr) if arr else 1
+        
+            for j, val in enumerate(arr): # for each bar item
+                
+                # section[:-1] to get 'page' or 'frame'
+                bar_id = f"{section[:-1]}-{i}-bar-{j}"
+                
+                # get bar
+                bar = document.get(bar_id)
+                
+                # update bar
+                if bar:
+                    height = (val / max_val) * 100
+                    bar.style.height = f"{height}px"
+                    bar.style.backgroundColor = ("#FF5733" if (section[:-1], i, j) in highlight else "steelblue")
 
 
 def animate(steps):
@@ -211,12 +239,23 @@ def animate(steps):
     Script for animation for external sorting.
     """
 
-    # TODO
+    i = 0
 
-    return
+    def update():
+        nonlocal i
+
+        if i < len(steps):
+            state, highlight = steps[i]
+            update_bars(state, highlight)
+            i += 1
+
+        else:
+            timer.clear_interval(interval_id)
+
+    interval_id = timer.set_interval(update, 500)
 
 
-def k_way_merge_sort(arr, k, n, callback):
+def k_way_merge_sort(pages, n_pages, n_frames, elements_per_page, callback):
     """
     arr: original data
     k: number of frames in main memory dedicated to input
@@ -226,8 +265,11 @@ def k_way_merge_sort(arr, k, n, callback):
     # initialize step memory
     steps = []
 
+    # initialize buffer
+    buffer = [[] for _ in range(n_frames)]
+
     # define step recording
-    def record(highlight=[]):
+    def record(highlight=set()):
         """
         Structure of highlight is a tuple of two elements.
 
@@ -238,21 +280,7 @@ def k_way_merge_sort(arr, k, n, callback):
         to highlight.
         """
 
-        steps.append((pages, buffer, highlight))
-
-    # divide original data in pages
-    pages = []
-    current_page = []
-
-    for elem in arr:
-        if len(current_page) < n:
-            current_page.append(elem)
-        else:
-            pages.append(current_page)
-            current_page = []
-
-    # initialize buffer
-    buffer = [[] for _ in range(k)]
+        steps.append(({"pages": pages, "buffer": buffer}, highlight))
 
     # record initial state
     record()
@@ -291,9 +319,25 @@ def on_sort_trigger(ev):
     method = document["sortMethod"].value
 
     if method == "k-way":
+        # get data
+        n_pages = document["n_pages"].value
+        n_frames = document["n_frames"].value
+        elements_per_page = document["elements_per_page"].value
+        manual_populate = document["manual_populate"].value
+
+        if not manual_populate:
+            # upper bound for random entry
+            upper = n_pages * elements_per_page * 10
+
+            # initialize random pages
+            pages = []
+
+            for _ in range(n_pages):
+                pages.append([random.randint(1, upper) for _ in range(elements_per_page)])
+
         # create objects
-        create_bars()
-        k_way_merge_sort(arr, 4, animate)
+        create_bars(pages)
+        k_way_merge_sort(pages, n_pages, n_frames, elements_per_page, animate)
     
     else:
         raw = document["arrayInput"].value
