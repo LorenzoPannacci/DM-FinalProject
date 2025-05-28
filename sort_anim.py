@@ -241,8 +241,6 @@ def update_bars(state, highlight=set()):
 
     expanded_highlight = preprocess_highlight(state, highlight)
 
-    print(expanded_highlight)
-
     for section, arrays in state.items():  # for each of 'pages' and 'frames'
         for i, arr in enumerate(arrays): # for each barplot of the section
         
