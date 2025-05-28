@@ -16,6 +16,10 @@ def main_create_bars(arr):
 
     container = document["container"]
     container.clear()
+
+    container.background = "#fafafa"
+
+
     max_val = max(arr) if arr else 1
 
     for i, val in enumerate(arr):
@@ -128,7 +132,7 @@ def create_bars(pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0,0,0,
     container = document["container"]
     container.clear()
 
-    # === Helper to create a titled section ===
+    # helper to create a titled section
     secondary_height = max(len(pages) * height_per_block, 300)
     buffer_height = max(len(frames) * height_per_block, 300)
 
@@ -140,11 +144,12 @@ def create_bars(pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0,0,0,
             section <= elem
         return section
 
-    # === Render a single array as bars with a label ===
+    # render a single array as bars with a label
     def render_array(arr, label, base_id):
         max_val = max(arr) if arr else 1
 
-        if max_val == 0: # handle "empty" array
+        # handle "empty" array
+        if max_val == 0:
             max_val = 1
 
         array_container = html.DIV(Class="array-container")
@@ -165,7 +170,7 @@ def create_bars(pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0,0,0,
 
         return array_container
 
-    # === Secondary Memory (Pages) ===
+    # secondary memory (pages)
     secondary_elements = []
     for i, page in enumerate(pages):
         label = f"Page {i+1}"
@@ -174,7 +179,7 @@ def create_bars(pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0,0,0,
 
     secondary_memory_section = create_section("Secondary Memory", secondary_elements, secondary_height)
 
-    # === Buffer (Frames) ===
+    # buffer (frames)
     buffer_elements = []
     for i, frame in enumerate(frames):
         label = f"Frame {i+1}"
@@ -183,7 +188,7 @@ def create_bars(pages=[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]], frames=[[0,0,0,
 
     buffer_section = create_section("Buffer", buffer_elements, buffer_height)
 
-    # === Overall Layout ===
+    # overall layout
     layout = html.DIV(Class="layout")
     layout <= secondary_memory_section
     layout <= buffer_section
