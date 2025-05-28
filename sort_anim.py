@@ -253,7 +253,7 @@ def update_bars(state, highlight=set()):
                 print(bar_id)
                 
                 # get bar
-                bar = document.get(bar_id)
+                bar = document.getElementById(bar_id)
                 
                 # update bar
                 if bar:
