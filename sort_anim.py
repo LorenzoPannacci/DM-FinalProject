@@ -1,4 +1,4 @@
-from browser import document, html, timer, alert, window
+from browser import document, html, timer, alert
 import random
 import copy
 
@@ -72,7 +72,7 @@ def main_animate(steps):
         else:
             timer.clear_interval(interval_id)
 
-    speed = window.animationSpeed
+    speed = int(document["speedRange"].value)
     interval_id = timer.set_interval(update, speed)
 
 
@@ -280,7 +280,8 @@ def animate(steps):
         else:
             timer.clear_interval(interval_id)
 
-    speed = window.animationSpeed
+    speed = int(document["speedRange"].value)
+    print(speed)
     interval_id = timer.set_interval(update, speed)
 
 
