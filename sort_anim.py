@@ -146,8 +146,15 @@ def create_bars(pages, frames):
     container.style["backgroundColor"] = "#e0f7fa"
 
     # helper to create a titled section
-    secondary_height = max(len(pages) * height_per_block, 300)
-    buffer_height = max(len(frames) * height_per_block, 300)
+    secondary_height = max(100 + len(pages) * height_per_block, 300)
+    buffer_height = max(100 + len(frames) * height_per_block, 300)
+
+    # get proprtion for bar heights
+    max_val = max(max(sublist) for sublist in pages + frames)
+
+    # handle "empty" array
+    if max_val == 0:
+        max_val = 1
 
     def create_section(title_text, content_elements, height_px):
         section = html.DIV(Class="section", style={"height": f"{height_px}px"})
@@ -159,11 +166,6 @@ def create_bars(pages, frames):
 
     # render a single array as bars with a label
     def render_array(arr, label, base_id):
-        max_val = max(arr) if arr else 1
-
-        # handle "empty" array
-        if max_val == 0:
-            max_val = 1
 
         array_container = html.DIV(Class="array-container")
         array_label = html.DIV(label, Class="array-label")
