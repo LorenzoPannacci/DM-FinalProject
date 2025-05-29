@@ -1,66 +1,25 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <meta charset="UTF-8" />
   <title>Sorting Algorithms Visualizer</title>
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.5/brython.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.5/brython_stdlib.js"></script>
-
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #e0f7fa; /* light blue background */
-      margin: 0;
-      padding: 0;
+    .warning {
+      display: none;
+      color: red;
+      font-size: 0.9em;
     }
-
-    h2 {
-      font-size: 2.5em;
-      font-weight: bold;
-      margin-top: 30px;
-      color: #00796b; /* deep teal */
-      text-shadow: 1px 1px 2px #b2dfdb;
+    .bar {
+    position: absolute;
+    bottom: 0;
+    background-color: #4CAF50;
+    transition: left 0.3s ease, height 0.3s ease, background-color 0.2s;
+    border-radius: 3px 3px 0 0;
     }
-
-    #container {
-    margin: 20px auto;
-    position: relative;
-    height: 320px;
-    width: 100%;
-    max-width: 900px;
-    display: flex;
-    flex-direction: row; /* ensures left-to-right */
-    justify-content: space-between;
-    padding: 10px;
-    box-sizing: border-box;
-    background: #e0f7fa; /* light blue background */
-    align-items: flex-start; /* aligns top edges */
-    }
-
-    .section {
-    display: flex;
-    flex-direction: column;
-    width: 48%; /* ensures both fit side by side */
-    border: 1px solid #ccc;
-    padding: 10px;
-    box-sizing: border-box;
-    background: #fafafa;
-    border-radius: 8px;
-    overflow-y: auto;
-    height: 300px;
-    }
-
-    .section-title {
-      font-weight: bold;
-      font-size: 1.2em;
-      margin-bottom: 10px;
-      border-bottom: 2px solid #00796b;
-      color: #00796b;
-    }
-
     .array-container {
       position: relative;
       height: 120px;
@@ -68,7 +27,6 @@
       border-bottom: 1px solid #ddd;
       padding-bottom: 5px;
     }
-
     .array-label {
       position: relative;
       font-weight: bold;
@@ -77,111 +35,717 @@
       text-align: left;
       color: #004d40;
     }
-
-    .bar {
-      position: absolute;
-      bottom: 0;
-      width: 20px;
-      background-color: #4CAF50;
-      transition: left 0.3s ease, height 0.3s ease, background-color 0.2s;
-      border-radius: 3px 3px 0 0;
-    }
-
-    .layout {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        height: 100%;
-        width: 100%;
-    }
-
-    #inputSection {
-    width: 250px;
-    background: #fafafa;
-    padding: 20px;
-    margin-right: 20px;
+    .section {
+    display: flex;
+    flex-direction: column;
+    min-width: 20%;
+    flex: 1;
     border: 1px solid #ccc;
-    padding: 10px;
+    padding: 15px;
     box-sizing: border-box;
+    background: #fafafa;
     border-radius: 8px;
-    text-align: left;
-    font-size: 14px;
-    height: auto; /* Make height adaptive */
+    margin: 5px;
     }
-
-    #inputSection label {
-    font-weight: bold;
-    color: #00796b;
+    .section-title {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #00796b;
+      color: #00796b;
+      padding-bottom: 8px;
     }
-
+    .memory-layout {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+      width: 100%;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    .memory-container {
+      width: 100%;
+      min-height: 400px;
+      overflow-y: auto;
+      padding: 10px;
+      position: relative;
+    }
+    .arrow-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
   </style>
 </head>
 
-<body onload="brython(); updateInputVisibility();">
-  <h2>Sorting Algorithm Visualizer</h2>
-
-  <div class="layout">
-    <div id="inputSection">
-      <label for="sortMethod">Sorting method:</label><br>
-      <select id="sortMethod" onchange="updateInputVisibility()">
-        <option value="k-way">K-Way</option>
-        <option value="bubble">Bubble Sort</option>
-        <option value="insertion">Insertion Sort</option>
-      </select>
-
-      <br><br>
-
-      <div id="arrayInputFields">
-        <label for="arrayInput">Input array:</label><br>
-        <input type="text" id="arrayInput" placeholder="Enter numbers e.g. 5,3,8,6" oninput="validateIntegerList(this)"><br>
-        <span class="warning" id="arrayInputWarning">Please enter only comma-separated integers.<br></span><br>
-      </div>
-
-      <div id="kWayFields" style="display: none;">
-        <label for="n_pages">Number of pages:</label><br>
-        <input type="text" id="n_pages" placeholder="e.g. 6" oninput="validateInteger(this)"><br>
-        <span class="warning" id="n_pagesWarning">Please enter a valid integer.<br></span><br>
-
-        <label for="n_frames">Number of frames in the buffer:</label><br>
-        <input type="text" id="n_frames" placeholder="e.g. 3 (2-way-sort)" oninput="validateInteger(this)"><br>
-        <span class="warning" id="n_framesWarning">Please enter a valid integer.<br></span><br>
-
-        <label for="elements_per_page">Elements per page/frame:</label><br>
-        <input type="text" id="elements_per_page" placeholder="e.g. 8" oninput="validateInteger(this)"><br>
-        <span class="warning" id="elements_per_pageWarning">Please enter a valid integer.<br></span><br>
-
-        <label for="manual_populate">
-        Manually populate pages
-        <input type="checkbox" id="manual_populate" oninput="updatePageInputs()">
-        </label><br>
-
-        <div id="pageInputsContainer"></div><br>
-      </div>
-
-      <button onclick="run_sort()">Run</button>
-
-      <br><br>
-      <label for="speedRange">Animation Speed (ms):</label><br>
-      <input type="range" id="speedRange" min="50" max="1000" value="500" step="50" oninput="updateSpeedDisplay()">
-      <span id="speedValue">500 ms</span>
-      <br><br>
-
+<body onload="brython(); updateInputVisibility();" class="bg-blue-50">
+  <div class="container mx-auto px-2 py-8">
+    
+    <div class="text-center mb-8 pb-4">
+        <h1 class="text-4xl font-extrabold bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent mb-3 pb-1 leading-tight">
+        Sorting Algorithm Visualizer
+        </h1>
+        <div class="w-32 h-1 bg-gradient-to-r from-teal-500 to-cyan-500 mx-auto rounded-full mb-2"></div>
+        <p class="text-lg text-gray-600 font-medium">Interactive visualization of sorting algorithms in secondary memory</p>
     </div>
 
-    <div id="container"></div>
+    <div class="flex flex-col lg:flex-row gap-3">
+      <div id="inputSection" class="bg-white p-6 rounded-lg shadow-md w-full lg:w-1/5 flex flex-col h-full">
+        <div class="mb-4">
+          <label for="sortMethod" class="block font-bold text-teal-700 mb-2">Sorting method:</label>
+          <select id="sortMethod" onchange="updateInputVisibility()" class="w-full p-2 border rounded">
+            <option value="k-way">K-Way Merge Sort</option>
+            <option value="bubble">Bubble Sort</option>
+            <option value="insertion">Insertion Sort</option>
+          </select>
+        </div>
+
+        <div id="arrayInputFields" class="mb-4">
+          <label for="arrayInput" class="block font-bold text-teal-700 mb-2">Input array:</label>
+          <input type="text" id="arrayInput" placeholder="Enter numbers e.g. 5,3,8,6" oninput="validateIntegerList(this)" class="w-full p-2 border rounded">
+          <span class="warning" id="arrayInputWarning">Please enter only comma-separated integers.<br></span>
+        </div>
+
+        <div id="kWayFields" style="display: none;" class="space-y-4">
+          <div>
+            <label for="n_pages" class="block font-bold text-teal-700 mb-2">Number of pages:</label>
+            <input type="text" id="n_pages" placeholder="e.g. 6" oninput="validateInteger(this)" class="w-full p-2 border rounded">
+            <span class="warning" id="n_pagesWarning">Please enter a valid integer.<br></span>
+          </div>
+
+          <div>
+            <label for="n_frames" class="block font-bold text-teal-700 mb-2">Number of frames in the buffer:</label>
+            <input type="text" id="n_frames" placeholder="e.g. 3 (2-way-sort)" oninput="validateInteger(this)" class="w-full p-2 border rounded">
+            <span class="warning" id="n_framesWarning">Please enter a valid integer.<br></span>
+          </div>
+
+          <div>
+            <label for="elements_per_page" class="block font-bold text-teal-700 mb-2">Elements per page/frame:</label>
+            <input type="text" id="elements_per_page" placeholder="e.g. 8" oninput="validateInteger(this)" class="w-full p-2 border rounded">
+            <span class="warning" id="elements_per_pageWarning">Please enter a valid integer.<br></span>
+          </div>
+
+          <div class="flex items-center">
+            <input type="checkbox" id="manual_populate" oninput="updatePageInputs()" class="mr-2">
+            <label for="manual_populate" class="font-bold text-teal-700">Manually populate pages</label>
+          </div>
+
+          <div id="pageInputsContainer"></div>
+        </div>
+
+        <div class="flex gap-2 mt-4">
+        <button onclick="run_sort()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded transition-colors">
+            Run
+        </button>
+        <button id="stopResumeBtn" onclick="toggleAnimation()" disabled class="flex-1 bg-gray-400 text-white font-bold py-2 px-4 rounded transition-colors cursor-not-allowed">
+            Stop
+        </button>
+        </div>
+
+        <div class="mt-6">
+          <label for="speedRange" class="block font-bold text-teal-700 mb-2">Animation Speed (ms):</label>
+          <input type="range" id="speedRange" min="50" max="1000" value="500" step="50" oninput="updateSpeedDisplay()" class="w-full">
+          <span id="speedValue" class="text-teal-700">500 ms</span>
+        </div>
+
+        <div class="mt-6">
+        <label class="block font-bold text-teal-700 mb-2">Logs:</label>
+        <div id="console" class="w-full min-h-32 flex-2 p-2 border rounded bg-gray-100 overflow-y-auto text-sm font-mono"></div>
+        </div>
+      </div>
+
+      <div id="container" class="relative bg-white p-4 rounded-lg shadow-md flex-1 min-h-[400px] flex items-center justify-center memory-container">
+        <p class="text-gray-500">Select a sorting method and input data to see the visualization</p>
+      </div>
+
+    </div>
   </div>
 
-  <script type="text/python" src="sort_anim.py"></script>
+  <script type="text/python">
+from browser import document, html, timer, alert, window
+import random
+import copy
 
-  <style>
-    .warning {
-      display: none;
-      color: red;
-      font-size: 0.9em;
-    }
-  </style>
+bar_max_height = 100
+height_per_block = 150
+current_arrows = {}
 
-  <script type="text/javascript">
+
+###########
+# UTILITY #
+###########
+
+def preprocess_highlight(state, highlight):
+    expanded_highlight = set()
+    for section, arrays in state.items():
+        for i, arr in enumerate(arrays):
+            for hl in highlight:
+                sec, idx, bar = hl
+                if sec == section and idx == i:
+                    if bar == "all":
+                        for j in range(len(arr)):
+                            expanded_highlight.add((sec, i, j))
+                    elif isinstance(bar, int):
+                        expanded_highlight.add((sec, i, bar))
+    return expanded_highlight
+
+
+def create_section(title_text, content_elements, height_px=None):
+    section = html.DIV(Class="section")
+    title = html.H3(title_text, Class="section-title")
+    section <= title
+    for elem in content_elements:
+        section <= elem
+    return section
+
+
+def render_array(arr, label, base_id, max_val):
+    array_container = html.DIV(Class="array-container")
+    array_container.id = f"{base_id}-container"
+    
+    if label:
+        array_label = html.DIV(label, Class="array-label")
+        array_container <= array_label
+
+    # Calculate width and spacing as percentage of container
+    num_bars = len(arr)
+    if num_bars > 0:
+        bar_width_percent = 80 / num_bars  # Use 80% of container, leaving 20% for spacing
+        spacing_percent = 20 / (num_bars + 1)  # Distribute remaining 20% as spacing
+    else:
+        bar_width_percent = 0
+        spacing_percent = 0
+
+    for i, val in enumerate(arr):
+        height = (val / max_val) * bar_max_height
+        left_position = spacing_percent + i * (bar_width_percent + spacing_percent)
+        
+        bar = html.DIV(
+            Class="bar",
+            style={
+                "height": f"{height}px",
+                "left": f"{left_position}%",
+                "width": f"{bar_width_percent}%"
+            },
+            id=f"{base_id}-bar-{i}"
+        )
+        array_container <= bar
+
+    return array_container
+
+
+def create_arrow_layer():
+    """Create SVG layer for arrows"""
+    svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+    svg.setAttribute("class", "arrow-svg")
+    svg.id = "arrowLayer"
+    
+    # Create defs for arrowhead marker
+    defs = document.createElementNS("http://www.w3.org/2000/svg", "defs")
+    marker = document.createElementNS("http://www.w3.org/2000/svg", "marker")
+    marker.setAttribute("id", "arrowhead")
+    marker.setAttribute("markerWidth", "10")
+    marker.setAttribute("markerHeight", "7")
+    marker.setAttribute("refX", "9")
+    marker.setAttribute("refY", "3.5")
+    marker.setAttribute("orient", "auto")
+    
+    polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon")
+    polygon.setAttribute("points", "0 0, 10 3.5, 0 7")
+    polygon.setAttribute("fill", "#000000")
+    
+    marker.appendChild(polygon)
+    defs.appendChild(marker)
+    svg.appendChild(defs)
+    
+    return svg
+
+
+def draw_arrow(from_id, to_id, arrow_id):
+    """Draw arrow between two elements"""
+    from_el = document.getElementById(from_id)
+    to_el = document.getElementById(to_id)
+    
+    if not from_el or not to_el:
+        return
+    
+    svg = document.getElementById("arrowLayer")
+    if not svg:
+        return
+    
+    # Remove existing arrow if it exists
+    existing_arrow = document.getElementById(arrow_id)
+    if existing_arrow:
+        existing_arrow.remove()
+    
+    # Get container bounds for relative positioning
+    container = document.getElementById("container")
+    container_rect = container.getBoundingClientRect()
+    
+    # Get element bounds
+    from_rect = from_el.getBoundingClientRect()
+    to_rect = to_el.getBoundingClientRect()
+    
+    # Calculate relative positions
+    x1 = from_rect.left - container_rect.left + from_rect.width
+    y1 = from_rect.top - container_rect.top + from_rect.height / 2
+    x2 = to_rect.left - container_rect.left
+    y2 = to_rect.top - container_rect.top + to_rect.height / 2
+    
+    # Create arrow line
+    line = document.createElementNS("http://www.w3.org/2000/svg", "line")
+    line.setAttribute("id", arrow_id)
+    line.setAttribute("x1", str(x1))
+    line.setAttribute("y1", str(y1))
+    line.setAttribute("x2", str(x2))
+    line.setAttribute("y2", str(y2))
+    line.setAttribute("stroke", "#000000")
+    line.setAttribute("stroke-width", "3")
+    line.setAttribute("marker-end", "url(#arrowhead)")
+    line.setAttribute("opacity", "0.8")
+    
+    svg.appendChild(line)
+    current_arrows[arrow_id] = line
+
+
+def remove_arrow(arrow_id):
+    """Remove an arrow"""
+    if arrow_id in current_arrows:
+        current_arrows[arrow_id].remove()
+        del current_arrows[arrow_id]
+
+
+def clear_all_arrows():
+    """Clear all arrows"""
+    for arrow_id in list(current_arrows.keys()):
+        remove_arrow(arrow_id)
+
+
+def log_to_console(message, newline=True):
+    """
+    Log a message to the console display.
+    If newline=False, the message will be added to the current line.
+    """
+    console = document["console"]
+    if newline:
+        console.innerHTML += f"<div>{message}</div>"
+    else:
+        # Get the last div or create one if none exists
+        divs = console.querySelectorAll("div")
+        if divs.length > 0:
+            last_div = divs[divs.length - 1]
+            last_div.innerHTML += f" {message}"
+        else:
+            console.innerHTML += f"<div>{message}</div>"
+    console.scrollTop = console.scrollHeight
+
+
+#######################
+# MAIN MEMORY SORTING #
+#######################
+
+def main_create_bars(arr):
+    """
+    Create bars for main memory sorting.
+    """
+    container = document["container"]
+    container.clear()
+    container.style["backgroundColor"] = "#e0f7fa"
+
+    height = 100 + height_per_block
+    max_val = max(arr) if arr else 1
+
+    # create section
+    main_elements = []
+    main_elements.append(render_array(arr, None, f"main", max_val))
+
+    main_memory_section = create_section("Main Memory", main_elements)
+
+    # Create flexible layout
+    layout = html.DIV(Class="memory-layout")
+    layout <= main_memory_section
+
+    container <= layout
+
+
+def main_update_bars(arr, highlight=[]):
+    """
+    Update bars for main memory soring.
+    """
+    max_val = max(arr) if arr else 1
+    
+    # Calculate width and spacing as percentage
+    num_bars = len(arr)
+    if num_bars > 0:
+        bar_width_percent = 80 / num_bars
+        spacing_percent = 20 / (num_bars + 1)
+    else:
+        bar_width_percent = 0
+        spacing_percent = 0
+
+    for i, val in enumerate(arr):
+        bar_id = f"main-bar-{i}"
+        bar = document.getElementById(bar_id)
+
+        height = (val / max_val) * 100
+        left_position = spacing_percent + i * (bar_width_percent + spacing_percent)
+        
+        bar.style.left = f"{left_position}%"
+        bar.style.width = f"{bar_width_percent}%"
+        bar.style.height = f"{height}px"
+        bar.style.backgroundColor = "#FF5733" if i in highlight else "#4CAF50"
+
+
+def main_animate(steps):
+    i = 0
+    def update():
+        nonlocal i
+        if i < len(steps):
+            paused = window.animationPaused if hasattr(window, 'animationPaused') else False
+            if not paused:
+                if len(steps[i]) == 3:  # New format with log
+                    state, highlight, log_message = steps[i]
+                else:  # Old format without log
+                    state, highlight = steps[i]
+                    log_message = None
+                
+                main_update_bars(state, highlight)
+                if log_message:
+                    log_to_console(log_message)
+                
+                i += 1
+                if i < len(steps):
+                    speed = int(document["speedRange"].value)
+                    timer.set_timeout(update, speed)
+                else:
+                    window.disableStopButton()
+            else:
+                timer.set_timeout(update, 100)
+    
+    window.enableStopButton()
+    update()
+
+
+def main_bubble_sort(arr, callback):
+    """
+    Main memory Bubblesort
+    """
+    steps = []
+
+    def record(a, highlight=[], log_message=None):
+        steps.append((a[:], highlight[:], log_message))
+
+    a = arr[:]
+    n = len(a)
+    for i in range(n):
+        for j in range(n - i - 1):
+            if a[j] > a[j + 1]:
+                a[j], a[j + 1] = a[j + 1], a[j]
+                record(a, [j, j + 1])
+
+    record(a)
+    callback(steps)
+
+
+def main_insertion_sort(arr, callback):
+    """
+    Main memory insertion sort.
+    """
+    steps = []
+
+    def record(a, highlight=[], log_message=None):
+        steps.append((a[:], highlight[:], log_message))
+
+    a = arr[:]
+    for i in range(1, len(a)):
+        key = a[i]
+        j = i - 1
+        while j >= 0 and key < a[j]:
+            a[j + 1] = a[j]
+            j -= 1
+            record(a, [j + 1, j + 2])
+        a[j + 1] = key
+        record(a, [j + 1])
+
+    record(a)
+    callback(steps)
+
+
+############################
+# SECONDARY MEMORY SORTING #
+############################
+
+def create_bars(input_pages, output_pages, frames):
+    """
+    Create bars for external sorting with separate input and output secondary memory.
+    """
+    container = document["container"]
+    container.clear()
+    container.style["backgroundColor"] = "#e0f7fa"
+    
+    # Clear existing arrows
+    clear_all_arrows()
+
+    # Calculate max value for scaling
+    all_values = []
+    for page in input_pages:
+        all_values.extend(page)
+    for page in output_pages:
+        all_values.extend(page)
+    for frame in frames:
+        all_values.extend(frame)
+    max_val = max(all_values) if all_values else 1
+
+    # Create input secondary memory section
+    input_elements = []
+    for i, page in enumerate(input_pages):
+        input_elements.append(render_array(page, f"Page {i+1}", f"input-page-{i}", max_val))
+
+    input_secondary_memory_section = create_section("Secondary Memory - Input Pass 0", input_elements)
+
+    # Create output secondary memory section
+    output_elements = []
+    for i, page in enumerate(output_pages):
+        output_elements.append(render_array(page, f"Page {i+1}", f"output-page-{i}", max_val))
+
+    output_secondary_memory_section = create_section("Secondary Memory - Output Pass 0", output_elements)
+
+    # Create buffer section
+    buffer_elements = []
+    for i, frame in enumerate(frames):
+        buffer_elements.append(render_array(frame, f"Frame {i+1}", f"frame-{i}", max_val))
+
+    buffer_section = create_section("Buffer", buffer_elements)
+
+    # Create flexible layout with buffer in the middle
+    layout = html.DIV(Class="memory-layout")
+    layout <= input_secondary_memory_section
+    layout <= buffer_section
+    layout <= output_secondary_memory_section
+
+    # Add arrow layer
+    svg = create_arrow_layer()
+    
+    container <= layout
+    container <= svg
+
+
+def update_bars(state, highlight=set()):
+    expanded_highlight = preprocess_highlight(state, highlight)
+    
+    # Calculate max value for consistent scaling
+    all_values = []
+    for section, arrays in state.items():
+        for arr in arrays:
+            all_values.extend(arr)
+    max_val = max(all_values) if all_values else 1
+    
+    for section, arrays in state.items():
+        for i, arr in enumerate(arrays):
+            for j, val in enumerate(arr):
+                if section == "input_pages":
+                    bar_id = f"input-page-{i}-bar-{j}"
+                elif section == "output_pages":
+                    bar_id = f"output-page-{i}-bar-{j}"
+                elif section == "frames":
+                    bar_id = f"frame-{i}-bar-{j}"
+                else:
+                    continue
+                    
+                bar = document.getElementById(bar_id)
+                if bar:
+                    height = (val / max_val) * bar_max_height
+                    bar.style.height = f"{height}px"
+                    bar.style.backgroundColor = "#FF5733" if (section, i, j) in expanded_highlight else "#4CAF50"
+
+
+def animate(steps):
+    i = 0
+    def update():
+        nonlocal i
+        if i < len(steps):
+            paused = window.animationPaused if hasattr(window, 'animationPaused') else False
+            if not paused:
+                state, highlight, arrows, log_message = steps[i]
+                update_bars(state, highlight)
+                
+                if log_message:
+                    log_to_console(log_message)
+                
+                # Handle arrows
+                if arrows:
+                    for arrow_info in arrows:
+                        if arrow_info["action"] == "draw":
+                            speed = int(document["speedRange"].value)
+                            delay = min(100, speed // 2)
+                            timer.set_timeout(lambda: draw_arrow(arrow_info["from"], arrow_info["to"], arrow_info["id"]), delay)
+                        elif arrow_info["action"] == "remove":
+                            remove_arrow(arrow_info["id"])
+                
+                i += 1
+                if i < len(steps):
+                    speed = int(document["speedRange"].value)
+                    timer.set_timeout(update, speed)
+                else:
+                    window.disableStopButton()
+            else:
+                timer.set_timeout(update, 100)
+    
+    window.enableStopButton()
+    update()
+
+
+def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, elements_per_page, callback):
+
+    steps = []
+    frames = [[] for _ in range(n_frames)]
+    
+    def record(highlight=set(), arrows=None, log_message=None):
+        input_pages_copy = copy.deepcopy(input_pages)
+        output_pages_copy = copy.deepcopy(output_pages)
+        frames_copy = copy.deepcopy(frames)
+        highlight_copy = copy.deepcopy(highlight)
+        arrows_copy = copy.deepcopy(arrows) if arrows else []
+        steps.append(({"input_pages": input_pages_copy, "output_pages": output_pages_copy, "frames": frames_copy}, highlight_copy, arrows_copy, log_message))
+
+    record(log_message="Pass 0: sort each page.")
+
+    for l in range(n_pages):
+        # load page into frame
+        frames[0] = copy.deepcopy(input_pages[l])
+
+        arrow_info = [{
+            "action": "draw",
+            "from": f"input-page-{l}-container",
+            "to": f"frame-0-container",
+            "id": f"arrow-input-page-{l}-frame-0"
+        }]
+
+        record(highlight=(("input_pages", l, "all"),
+                          ("frames", 0, "all")),
+                          arrows=arrow_info,
+                          log_message=f"Input {l+1} loaded in frame 1.")
+
+        # sort the frame using bubble sort
+        for i in range(len(frames[0])):
+            for j in range(len(frames[0]) - i - 1):
+                if frames[0][j] > frames[0][j + 1]:
+                    frames[0][j], frames[0][j + 1] = frames[0][j + 1], frames[0][j]
+                    record(highlight=(("frames", 0, j), ("frames", 0, j+1)))
+
+        # write sorted frame to output page
+        output_pages[l] = copy.deepcopy(frames[0])
+        arrow_remove_input = [{
+            "action": "remove",
+            "id": f"arrow-input-page-{l}-frame-0"
+        }]
+        arrow_to_output = [{
+            "action": "draw",
+            "from": f"frame-0-container",
+            "to": f"output-page-{l}-container",
+            "id": f"arrow-frame-0-output-page-{l}"
+        }]
+        record(highlight=(("frames", 0, "all"),
+                          ("output_pages", l, "all")),
+                          arrows=arrow_remove_input + arrow_to_output,
+                          log_message=f"Frame 1 written in output {l+1}.")
+        
+        # remove arrow to output after a brief moment
+        arrow_remove_output = [{
+            "action": "remove",
+            "id": f"arrow-frame-0-output-page-{l}"
+        }]
+        record(arrows=arrow_remove_output)
+
+    record(log_message="Pass 0 completed.")
+    callback(steps)
+
+
+###############
+# MAIN SCRIPT #
+###############
+
+def get_manual_inputs():
+    n_pages = int(document["n_pages"].value)
+    pages = []
+    for i in range(1, n_pages + 1):
+        input_id = f"page_{i}"
+        if input_id in document:
+            raw_input = document[input_id].value.strip()
+            if raw_input:
+                try:
+                    numbers = [int(x.strip()) for x in raw_input.split(",")]
+                    pages.append(numbers)
+                except ValueError:
+                    alert(f"Invalid input in Page {i}. Please enter only integers.")
+                    return
+            else:
+                pages.append([])
+        else:
+            pages.append([])
+    return pages
+
+
+def on_sort_trigger(ev):
+    method = document["sortMethod"].value
+    document.getElementById("console").innerHTML = ""
+
+    if method == "k-way":
+        try:
+            n_pages = int(document["n_pages"].value)
+            n_frames = int(document["n_frames"].value)
+            elements_per_page = int(document["elements_per_page"].value)
+        except ValueError:
+            alert("Please enter valid integers for all K-way merge sort parameters.")
+            return
+
+        if not document["manual_populate"].checked:
+            upper = n_pages * elements_per_page * 10
+            input_pages = []
+            for _ in range(n_pages):
+                input_pages.append([random.randint(1, upper) for _ in range(elements_per_page)])
+        else:
+            input_pages = get_manual_inputs()
+            if not input_pages:
+                return
+
+        # Initialize output pages with same structure as input but empty values
+        output_pages = [[0] * elements_per_page for _ in range(n_pages)]
+        frames = [[0] * elements_per_page for _ in range(n_frames)]
+        
+        create_bars(input_pages, output_pages, frames)
+        k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, elements_per_page, animate)
+    
+    else:
+        raw = document["arrayInput"].value
+        try:
+            arr = list(map(int, raw.strip().split(',')))
+        except:
+            alert("Invalid input. Please enter comma-separated integers.")
+            return
+
+        if method == "bubble":
+            main_create_bars(arr)
+            main_bubble_sort(arr, main_animate)
+        elif method == "insertion":
+            main_create_bars(arr)
+            main_insertion_sort(arr, main_animate)
+
+
+document.bind("start_sort", on_sort_trigger)
+  </script>
+
+  <script>
+    window.isAnimationRunning = false;
+    window.animationPaused = false;
+    let currentTimeoutId = null;
+
     function run_sort() {
       document.dispatchEvent(new Event("start_sort"));
     }
@@ -246,7 +810,6 @@
         const warning = document.getElementById("n_pagesWarning");
         const manualCheckbox = document.getElementById("manual_populate");
 
-        // Clear existing inputs
         container.innerHTML = "";
 
         const value = nPagesInput.value.trim();
@@ -255,7 +818,6 @@
 
         if (value === "" || !isValid || nPages <= 0 || !manualCheckbox.checked) return;
 
-        // Insert a light gray divider line before inputs
         const divider = document.createElement("hr");
         divider.style.border = "none";
         divider.style.borderTop = "1px solid lightgray";
@@ -265,7 +827,7 @@
 
         for (let i = 0; i < nPages; i++) {
             const wrapper = document.createElement("div");
-            wrapper.style.marginTop = "10px"; // same vertical spacing as <br><br>
+            wrapper.style.marginTop = "10px";
 
             const label = document.createElement("label");
             label.innerText = `Page ${i + 1}:`;
@@ -275,24 +837,21 @@
             input.type = "text";
             input.placeholder = "Enter numbers e.g. 5,3,8,6";
             input.id = `page_${i + 1}`;
-            input.oninput = function () {
+            input.oninput = function() {
                 validateIntegerList(this);
             };
-            wrapper.appendChild(document.createElement("br"));
+            input.className = "w-full p-2 border rounded mt-1";
             wrapper.appendChild(input);
 
             const span = document.createElement("span");
             span.className = "warning";
             span.id = `page_${i + 1}Warning`;
             span.innerText = "Please enter only comma-separated integers.";
-            wrapper.appendChild(document.createElement("br"));
             wrapper.appendChild(span);
 
             container.appendChild(wrapper);
         }
     }
-
-    let animationSpeed = 500; // Default to 500ms
 
     function updateSpeedDisplay() {
       const slider = document.getElementById("speedRange");
@@ -301,19 +860,46 @@
       speedValue.textContent = `${animationSpeed} ms`;
     }
 
-    // Use animationSpeed inside your sorting visualization logic
-    // For example:
-    async function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+    function toggleAnimation() {
+        const btn = document.getElementById("stopResumeBtn");
+        
+        if (!window.animationPaused) {
+            // Stop animation
+            window.animationPaused = true;
+            if (currentTimeoutId) {
+            clearTimeout(currentTimeoutId);
+            }
+            btn.textContent = "Resume";
+            btn.className = "flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors";
+        } else {
+            // Resume animation
+            window.animationPaused = false;
+            btn.textContent = "Stop";
+            btn.className = "flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors";
+        }
     }
 
-    async function visualizeStep() {
-      // Example usage in sorting:
-      await sleep(animationSpeed);
-      // update visual state here
+    window.enableStopButton = function() {
+        const btn = document.getElementById("stopResumeBtn");
+        btn.disabled = false;
+        btn.className = "flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors";
+        window.isAnimationRunning = true;
+        window.animationPaused = false;
     }
+
+    window.disableStopButton = function() {
+        const btn = document.getElementById("stopResumeBtn");
+        btn.disabled = true;
+        btn.textContent = "Stop";
+        btn.className = "flex-1 bg-gray-400 text-white font-bold py-2 px-4 rounded transition-colors cursor-not-allowed";
+        window.isAnimationRunning = false;
+        window.animationPaused = false;
+    }
+
+    function clearConsole() {
+        document.getElementById("console").innerHTML = "";
+    }
+
   </script>
-
 </body>
-
 </html>
