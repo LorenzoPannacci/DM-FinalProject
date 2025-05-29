@@ -355,6 +355,29 @@ def k_way_merge_sort(pages, frames, n_pages, n_frames, elements_per_page, callba
 # MAIN SCRIPT #
 ###############
 
+def get_manual_inputs():
+    n_pages = int(document["n_pages"].value)
+
+    pages = []
+    for i in range(1, n_pages + 1):
+        input_id = f"page_{i}"
+        if input_id in document:
+            raw_input = document[input_id].value.strip()
+            if raw_input:
+                try:
+                    numbers = [int(x.strip()) for x in raw_input.split(",")]
+                    pages.append(numbers)
+
+                except ValueError:
+                    alert(f"Invalid input in Page {i}. Please enter only integers.")
+                    return
+            else:
+                pages.append([])
+
+        else:
+            pages.append([])
+
+
 def on_sort_trigger(ev):
     method = document["sortMethod"].value
 
@@ -376,8 +399,7 @@ def on_sort_trigger(ev):
 
         else:
             # get pages from fields
-            # TODO
-            pages = [[1,2,3,4]]
+            pages = get_manual_inputs()
 
         # initialize frames
         frames = [[0] * elements_per_page] * n_frames
