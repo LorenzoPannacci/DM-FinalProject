@@ -377,6 +377,8 @@ def get_manual_inputs():
         else:
             pages.append([])
 
+    return pages
+
 
 def on_sort_trigger(ev):
     method = document["sortMethod"].value
