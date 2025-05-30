@@ -578,7 +578,7 @@ def animate(steps):
                 
                 if log_message:
                     log_to_console(log_message)
-                
+               
                 # handle arrows
                 if arrows:
                     for arrow_info in arrows:
@@ -607,8 +607,18 @@ def animate(steps):
                     window.disableStopButton()
             else:
                 timer.set_timeout(update, 100)
-    
+
+        if i >= len(steps):
+            for section_idx, section in enumerate(document.querySelectorAll('.section')):
+                title_element = section.querySelector('.section-title')
+                if title_element and 'Output Pass' in title_element.innerHTML:
+                    # Find all bars in this output section
+                    bars = section.querySelectorAll('.bar')
+                    for bar in bars:
+                        bar.style.backgroundColor = "#4682B4"  # Light blue color
+
     window.enableStopButton()
+
     update()
 
 
@@ -913,7 +923,7 @@ def on_sort_trigger(ev):
 
         if not document["manual_populate"].checked:
             input_pages = []
-            for i in range(n_pages):
+            for i in range(n_pages, 0, -1):
                 # Different range for each page to create visual variety
                 base = (i + 1) * elements_per_page * 3
                 page_range = elements_per_page * 15
