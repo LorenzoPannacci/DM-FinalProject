@@ -709,6 +709,8 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
 
        # perform each execution
        for exec_idx, execution in enumerate(executions):
+           record(log_message=f"Starting Run {exec_idx+1}.")
+
            # Initialize frame pointers and page pointers for each run
            frame_pointers = [0] * len(execution)  # Points to current element in each frame
            page_pointers = [0] * len(execution)   # Points to current page in each run
@@ -764,8 +766,7 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
                output_frame_pointer += 1
                
                record(highlight=(("frames", min_frame, frame_pointers[min_frame]),
-                               ("frames", n_frames-1, output_frame_pointer-1)),
-                      log_message=f"Selected {min_val} from frame {min_frame + 1}.")
+                               ("frames", n_frames-1, output_frame_pointer-1)))
                
                frames[min_frame][frame_pointers[min_frame]] = 0
                frame_pointers[min_frame] += 1
@@ -863,7 +864,11 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
                    }]
                    record(arrows=arrow_remove)
 
+           record(log_message=f"Run {exec_idx+1} completed.")
+
        record(log_message=f"Pass {pass_num} completed.")
+
+   record(log_message="Sorting completed.")
 
    callback(steps)
 
