@@ -206,7 +206,7 @@ def create_section(title_text, content_elements, height_px=None):
     return section
 
 
-def render_array(arr, label, base_id, max_val):
+def render_array(arr, label, base_id, max_val, run_info=None):
     array_container = html.DIV(Class="array-container")
     array_container.id = f"{base_id}-container"
     
@@ -573,7 +573,7 @@ def animate(steps):
         if i < len(steps):
             paused = window.animationPaused if hasattr(window, 'animationPaused') else False
             if not paused:
-                state, highlight, arrows, log_message, swap = steps[i]
+                state, highlight, arrows, log_message, swap, memory_run_info, buffer_run_info = steps[i]
                 update_bars(state, highlight)
                 
                 if log_message:
@@ -599,6 +599,35 @@ def animate(steps):
                             elif 'Output Pass' in title_element.innerHTML:
                                 title_element.innerHTML = f"Secondary Memory - Output Pass {swap}"
                 
+                if memory_run_info:
+                    if 'input' in memory_run_info:
+                        for page_idx, run_num in memory_run_info['input'].items():
+                            container = document.getElementById(f"input-page-{page_idx}-container")
+                            if container:
+                                label_element = container.querySelector('.array-label')
+                                if label_element:
+                                    label_element.innerHTML = f"Page {page_idx+1} (Run {run_num})"
+                    
+                    if 'output' in memory_run_info:
+                        for page_idx, run_num in memory_run_info['output'].items():
+                            container = document.getElementById(f"output-page-{page_idx}-container")
+                            if container:
+                                label_element = container.querySelector('.array-label')
+                                if label_element:
+                                    label_element.innerHTML = f"Page {page_idx+1} (Run {run_num})"
+                
+                if buffer_run_info:
+                    for frame_idx, run_num in buffer_run_info.items():
+                        container = document.getElementById(f"frame-{frame_idx}-container")
+                        if container:
+                            label_element = container.querySelector('.array-label')
+                            if label_element:
+                                if run_num == "output":
+                                    label_element.innerHTML = f"Frame {frame_idx+1} (Output)"
+                                else:
+                                    label_element.innerHTML = f"Frame {frame_idx+1} (Run {run_num})"
+
+
                 i += 1
                 if i < len(steps):
                     speed = int(document["speedRange"].value)
@@ -627,7 +656,7 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
    steps = []
    frames = [[] for _ in range(n_frames)]
    
-   def record(highlight=set(), arrows=None, log_message=None, swap=False):
+   def record(highlight=set(), arrows=None, log_message=None, swap=False, memory_run_info=None, buffer_run_info=None):
        input_pages_copy = copy.deepcopy(input_pages)
        output_pages_copy = copy.deepcopy(output_pages)
        frames_copy = copy.deepcopy(frames)
@@ -639,7 +668,9 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
                      highlight_copy,
                      arrows_copy,
                      log_message,
-                     swap))
+                     swap,
+                     memory_run_info,
+                     buffer_run_info))
 
    record(log_message="Pass 0: sort each page.")
 
@@ -707,7 +738,27 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
        # reset output page
        output_pages = [[0] * elements_per_page for _ in range(n_pages)]
 
-       record(log_message=f"Starting Pass {pass_num}.", swap=pass_num)
+       # Calculate run assignments for this pass
+       input_run_assignments = {}
+       output_run_assignments = {}
+
+       for i in range(len(input_pages)):
+           input_run_assignments[i] = (i // old_runs_size) + 1
+
+       if pass_num == n_passes:  # final pass
+           for i in range(len(output_pages)):
+               output_run_assignments[i] = 1
+       else:
+           next_runs_size = k ** pass_num
+           for i in range(len(output_pages)):
+               output_run_assignments[i] = (i // next_runs_size) + 1
+
+       run_info = {
+           'input': input_run_assignments,
+           'output': output_run_assignments
+       }
+
+       record(log_message=f"Starting Pass {pass_num}.", swap=pass_num, memory_run_info=run_info)
 
        # divide into runs
        runs = [input_pages[i:i + old_runs_size] for i in range(0, len(input_pages), old_runs_size)]
@@ -720,6 +771,14 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
        # perform each execution
        for exec_idx, execution in enumerate(executions):
            record(log_message=f"Starting Run {exec_idx+1}.")
+
+           run_info = {}
+           run_info[k] = "output"
+
+           for frame in range(n_frames-1):
+               run_info[frame] = k * exec_idx + frame + 1
+
+           record(buffer_run_info=run_info)
 
            # Initialize frame pointers and page pointers for each run
            frame_pointers = [0] * len(execution)  # Points to current element in each frame
