@@ -92,6 +92,14 @@
       pointer-events: none;
       z-index: 10;
     }
+    .run-outline {
+    position: absolute;
+    border: 4px solid #adadad;
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: 5;
+    background: transparent;
+    }
   </style>
 </head>
 
@@ -364,6 +372,63 @@ def log_to_console(message, newline=True):
         else:
             console.innerHTML += f"<div>{message}</div>"
     console.scrollTop = console.scrollHeight
+
+
+def create_run_outlines(state, memory_run_info):
+    """Create outlined boxes around pages belonging to the same run"""
+    # Clear existing outlines
+    existing_outlines = document.querySelectorAll('.run-outline')
+    for outline in existing_outlines:
+        outline.remove()
+    
+    if not memory_run_info:
+        return
+    
+    container = document.getElementById("container")
+    
+    for section_type in ['input', 'output']:
+        if section_type not in memory_run_info:
+            continue
+            
+        run_assignments = memory_run_info[section_type]
+        
+        # Group pages by run number
+        runs = {}
+        for page_idx, run_num in run_assignments.items():
+            if run_num not in runs:
+                runs[run_num] = []
+            runs[run_num].append(page_idx)
+        
+        # Create outline for each run with multiple pages
+        for run_num, page_indices in runs.items():
+            if len(page_indices) > 1:  # Only outline runs with multiple pages
+                # Find the bounding box of all pages in this run
+                first_page_idx = min(page_indices)
+                last_page_idx = max(page_indices)
+                
+                first_container = document.getElementById(f"{section_type}-page-{first_page_idx}-container")
+                last_container = document.getElementById(f"{section_type}-page-{last_page_idx}-container")
+                
+                if first_container and last_container:
+                    # Get positions relative to the main container
+                    container_rect = container.getBoundingClientRect()
+                    first_rect = first_container.getBoundingClientRect()
+                    last_rect = last_container.getBoundingClientRect()
+                    
+                    # Calculate outline dimensions
+                    left = first_rect.left - container_rect.left - 10
+                    top = first_rect.top - container_rect.top - 10
+                    right = last_rect.right - container_rect.left + 10
+                    bottom = last_rect.bottom - container_rect.top + 10
+                    
+                    # Create outline element
+                    outline = html.DIV(Class="run-outline")
+                    outline.style.left = f"{left}px"
+                    outline.style.top = f"{top}px"
+                    outline.style.width = f"{right - left}px"
+                    outline.style.height = f"{bottom - top}px"
+                    
+                    container <= outline
 
 
 #######################
@@ -652,6 +717,8 @@ def animate(steps):
                                 label_element = container.querySelector('.array-label')
                                 if label_element:
                                     label_element.innerHTML = f"Page {page_idx+1} (Run {run_num})"
+
+                    create_run_outlines(state, memory_run_info)
                 
                 if buffer_run_info:
                     for frame_idx, run_num in buffer_run_info.items():
@@ -1040,12 +1107,8 @@ def on_sort_trigger(ev):
         if not document["manual_populate"].checked:
             input_pages = []
             for i in range(n_pages, 0, -1):
-                # Different range for each page to create visual variety
-                base = (i + 1) * elements_per_page * 3
-                page_range = elements_per_page * 15
-                lower = max(1, base - page_range // 2)
-                upper = base + page_range // 2
-                input_pages.append([random.randint(lower, upper) for _ in range(elements_per_page)])
+                page = [random.randint(1, elements_per_page * n_pages * 10) for _ in range(elements_per_page)]
+                input_pages.append(page)
         else:
             input_pages = get_manual_inputs()
             if not input_pages:
