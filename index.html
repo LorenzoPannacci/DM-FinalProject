@@ -654,6 +654,7 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
 
    steps = []
    frames = [[] for _ in range(n_frames)]
+   n_accesses = 0
    
    def record(highlight=set(), arrows=None, log_message=None, swap=False, memory_run_info=None, buffer_run_info=None):
        input_pages_copy = copy.deepcopy(input_pages)
@@ -676,6 +677,7 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
    for l in range(n_pages):
        # load page into frame
        frames[0] = copy.deepcopy(input_pages[l])
+       n_accesses += 1
 
        arrow_info = [{
            "action": "draw",
@@ -698,6 +700,8 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
 
        # write sorted frame to output page
        output_pages[l] = copy.deepcopy(frames[0])
+       n_accesses += 1
+
        arrow_remove_input = [{
            "action": "remove",
            "id": f"arrow-input-page-{l}-frame-0"
@@ -793,6 +797,7 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
            # load first page of each run into buffer frames
            for j in range(len(execution)):
                frames[j] = copy.deepcopy(execution[j][0])
+               n_accesses += 1
                
                # Calculate the global page index for the first page of this run
                global_page_idx = exec_idx * k * old_runs_size + j * old_runs_size
@@ -842,6 +847,7 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
                # if output frame is full write it in the output secondary memory and empty it
                if output_frame_pointer == elements_per_page:
                    output_pages[output_page_idx] = copy.deepcopy(frames[-1])
+                   n_accesses += 1
                    
                    arrow_to_output = [{
                        "action": "draw",
@@ -875,6 +881,7 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
                        
                        if global_page_idx < len(input_pages):
                            frames[min_frame] = copy.deepcopy(execution[min_frame][page_in_run])
+                           n_accesses += 1
                            frame_pointers[min_frame] = 0
                            
                            # Remove the current arrow using the tracked ID
@@ -902,6 +909,7 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
            # write remaining elements in output frame if any
            if output_frame_pointer > 0:
                output_pages[output_page_idx] = copy.deepcopy(frames[-1])
+               n_accesses += 1
                
                arrow_to_output = [{
                    "action": "draw",
@@ -937,6 +945,10 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
        record(log_message=f"Pass {pass_num} completed.")
 
    record(log_message="Sorting completed.")
+
+   record(log_message="‎")
+   record(log_message=f"Total passes: {pass_num}.")
+   record(log_message=f"Total memory accesses: {n_accesses}.")
 
    callback(steps)
 
@@ -977,6 +989,14 @@ def on_sort_trigger(ev):
             elements_per_page = int(document["elements_per_page"].value)
         except ValueError:
             alert("Please enter valid integers for all K-way merge sort parameters.")
+            return
+
+        if n_frames <= 2:
+            alert("Number of frames in the buffer must be at least 3!")
+            return
+
+        if n_pages <= 1:
+            alert("Number of pages must be at least 2!")
             return
 
         if not document["manual_populate"].checked:
