@@ -20,6 +20,17 @@
     transition: left 0.3s ease, height 0.3s ease, background-color 0.2s;
     border-radius: 3px 3px 0 0;
     }
+    .bar-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: #000;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    }
     .array-container {
       position: relative;
       height: 120px;
@@ -235,6 +246,15 @@ def render_array(arr, label, base_id, max_val, run_info=None):
             },
             id=f"{base_id}-bar-{i}"
         )
+
+        # Add text element for the value
+        bar_text = html.DIV(
+            str(val) if val != 0 else "",
+            Class="bar-text",
+            id=f"{base_id}-bar-text-{i}"
+        )
+        bar <= bar_text
+
         array_container <= bar
 
     return array_container
@@ -401,6 +421,10 @@ def main_update_bars(arr, highlight=[]):
         bar.style.height = f"{height}px"
         bar.style.backgroundColor = "#FF5733" if i in highlight else "#4CAF50"
 
+        text_element = document.getElementById(f"main-bar-text-{i}")
+        if text_element:
+            text_element.innerHTML = str(val)
+
 
 def main_animate(steps):
     i = 0
@@ -564,6 +588,20 @@ def update_bars(state, highlight=set()):
                     bar.style.height = f"{height}px"
                     bar.style.backgroundColor = "#FF5733" if (section, i, j) in expanded_highlight else "#4CAF50"
 
+                if section == "input_pages":
+                    text_id = f"input-page-{i}-bar-text-{j}"
+                elif section == "output_pages":
+                    text_id = f"output-page-{i}-bar-text-{j}"
+                elif section == "frames":
+                    text_id = f"frame-{i}-bar-text-{j}"
+
+                text_element = document.getElementById(text_id)
+                if text_element:
+                    if val == 0 or val is None:
+                        text_element.innerHTML = ""
+                    else:
+                        text_element.innerHTML = str(val)
+
 
 def animate(steps):
     i = 0
@@ -643,7 +681,7 @@ def animate(steps):
                     # Find all bars in this output section
                     bars = section.querySelectorAll('.bar')
                     for bar in bars:
-                        bar.style.backgroundColor = "#4682B4"  # Light blue color
+                        bar.style.backgroundColor = "#6ca6d6"  # Light blue color
 
     window.enableStopButton()
 
