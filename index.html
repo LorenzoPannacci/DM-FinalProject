@@ -150,6 +150,11 @@
           </div>
 
           <div class="flex items-center">
+            <input type="checkbox" id="sort_page_by_page" checked class="mr-2">
+            <label for="sort_page_by_page" class="font-bold text-teal-700">Sort page-by-page</label>
+          </div>
+
+          <div class="flex items-center">
             <input type="checkbox" id="manual_populate" oninput="updatePageInputs()" class="mr-2">
             <label for="manual_populate" class="font-bold text-teal-700">Manually populate pages</label>
           </div>
@@ -757,305 +762,410 @@ def animate(steps):
 
 def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, elements_per_page, callback):
 
-   steps = []
-   frames = [[] for _ in range(n_frames)]
-   n_accesses = 0
-   
-   def record(highlight=set(), arrows=None, log_message=None, swap=False, memory_run_info=None, buffer_run_info=None):
-       input_pages_copy = copy.deepcopy(input_pages)
-       output_pages_copy = copy.deepcopy(output_pages)
-       frames_copy = copy.deepcopy(frames)
-       highlight_copy = copy.deepcopy(highlight)
-       arrows_copy = copy.deepcopy(arrows) if arrows else []
-       steps.append(({"input_pages": input_pages_copy,
-                      "output_pages": output_pages_copy,
-                      "frames": frames_copy},
-                     highlight_copy,
-                     arrows_copy,
-                     log_message,
-                     swap,
-                     memory_run_info,
-                     buffer_run_info))
+    steps = []
+    frames = [[] for _ in range(n_frames)]
+    n_accesses = 0
 
-   record(log_message="Pass 0: sort each page.")
+    def record(highlight=set(), arrows=None, log_message=None, swap=False, memory_run_info=None, buffer_run_info=None):
+        input_pages_copy = copy.deepcopy(input_pages)
+        output_pages_copy = copy.deepcopy(output_pages)
+        frames_copy = copy.deepcopy(frames)
+        highlight_copy = copy.deepcopy(highlight)
+        arrows_copy = copy.deepcopy(arrows) if arrows else []
+        steps.append(({"input_pages": input_pages_copy,
+                        "output_pages": output_pages_copy,
+                        "frames": frames_copy},
+                        highlight_copy,
+                        arrows_copy,
+                        log_message,
+                        swap,
+                        memory_run_info,
+                        buffer_run_info))
 
-   for l in range(n_pages):
-       # load page into frame
-       frames[0] = copy.deepcopy(input_pages[l])
-       n_accesses += 1
+    # Check if sorting page-by-page
+    sort_page_by_page = document["sort_page_by_page"].checked
 
-       arrow_info = [{
-           "action": "draw",
-           "from": f"input-page-{l}-container",
-           "to": f"frame-0-container",
-           "id": f"arrow-input-page-{l}-frame-0"
-       }]
+    if sort_page_by_page:
+        record(log_message="Pass 0: sort each page.")
+        
+        for l in range(n_pages):
+            # load page into frame
+            frames[0] = copy.deepcopy(input_pages[l])
+            n_accesses += 1
 
-       record(highlight=(("input_pages", l, "all"),
-                         ("frames", 0, "all")),
-                         arrows=arrow_info,
-                         log_message=f"Input {l+1} loaded in frame 1.")
+            arrow_info = [{
+                "action": "draw",
+                "from": f"input-page-{l}-container",
+                "to": f"frame-0-container",
+                "id": f"arrow-input-page-{l}-frame-0"
+            }]
 
-       # sort the frame using bubble sort
-       for i in range(len(frames[0])):
-           for j in range(len(frames[0]) - i - 1):
-               if frames[0][j] > frames[0][j + 1]:
-                   frames[0][j], frames[0][j + 1] = frames[0][j + 1], frames[0][j]
-                   record(highlight=(("frames", 0, j), ("frames", 0, j+1)))
+            record(highlight=(("input_pages", l, "all"),
+                            ("frames", 0, "all")),
+                            arrows=arrow_info,
+                            log_message=f"Input {l+1} loaded in frame 1.")
 
-       # write sorted frame to output page
-       output_pages[l] = copy.deepcopy(frames[0])
-       n_accesses += 1
+            # sort the frame using bubble sort
+            for i in range(len(frames[0])):
+                for j in range(len(frames[0]) - i - 1):
+                    if frames[0][j] > frames[0][j + 1]:
+                        frames[0][j], frames[0][j + 1] = frames[0][j + 1], frames[0][j]
+                        record(highlight=(("frames", 0, j), ("frames", 0, j+1)))
 
-       arrow_remove_input = [{
-           "action": "remove",
-           "id": f"arrow-input-page-{l}-frame-0"
-       }]
-       arrow_to_output = [{
-           "action": "draw",
-           "from": f"frame-0-container",
-           "to": f"output-page-{l}-container",
-           "id": f"arrow-frame-0-output-page-{l}"
-       }]
-       record(highlight=(("frames", 0, "all"),
-                         ("output_pages", l, "all")),
-                         arrows=arrow_remove_input + arrow_to_output,
-                         log_message=f"Frame 1 written in output {l+1}.")
-       
-       # remove arrow to output after a brief moment
-       arrow_remove_output = [{
-           "action": "remove",
-           "id": f"arrow-frame-0-output-page-{l}"
-       }]
-       record(arrows=arrow_remove_output)
+            # write sorted frame to output page
+            output_pages[l] = copy.deepcopy(frames[0])
+            n_accesses += 1
 
-   record(log_message="Pass 0 completed.")
+            arrow_remove_input = [{
+                "action": "remove",
+                "id": f"arrow-input-page-{l}-frame-0"
+            }]
+            arrow_to_output = [{
+                "action": "draw",
+                "from": f"frame-0-container",
+                "to": f"output-page-{l}-container",
+                "id": f"arrow-frame-0-output-page-{l}"
+            }]
+            record(highlight=(("frames", 0, "all"),
+                            ("output_pages", l, "all")),
+                            arrows=arrow_remove_input + arrow_to_output,
+                            log_message=f"Frame 1 written in output {l+1}.")
+            
+            # remove arrow to output after a brief moment
+            arrow_remove_output = [{
+                "action": "remove",
+                "id": f"arrow-frame-0-output-page-{l}"
+            }]
+            record(arrows=arrow_remove_output)
 
-   # merge passes
-   k = n_frames - 1
-   n_passes = math.ceil(math.log(n_pages, k))
+    else:
 
-   for pass_num in range(1, n_passes + 1):
-       # get pass infos
-       old_runs_size = k ** (pass_num - 1)
-       current_runs_size = k ** pass_num
+        output_run_assignments = {}
 
-       # swap input and output secondary memory
-       input_pages, output_pages = output_pages, input_pages
-   
-       # reset output page
-       output_pages = [[0] * elements_per_page for _ in range(n_pages)]
+        for i in range(len(output_pages)):
+            output_run_assignments[i] = (i // n_frames) + 1
 
-       # Calculate run assignments for this pass
-       input_run_assignments = {}
-       output_run_assignments = {}
+        run_info = {
+            'output': output_run_assignments
+        }
 
-       for i in range(len(input_pages)):
-           input_run_assignments[i] = (i // old_runs_size) + 1
+        record(log_message="Pass 0: fill buffer and perform in-place sort.", memory_run_info=run_info)
+        
+        # Process pages in groups
+        for group_start in range(0, n_pages, n_frames):
+            group_end = min(group_start + n_frames, n_pages)
+            current_group_size = group_end - group_start
+            
+            # Load pages into frames
+            current_arrows = []
+            for i in range(current_group_size):
+                page_idx = group_start + i
+                frames[i] = copy.deepcopy(input_pages[page_idx])
+                n_accesses += 1
+                
+                arrow_id = f"arrow-input-page-{page_idx}-frame-{i}"
+                current_arrows.append(arrow_id)
+                
+                arrow_info = [{
+                    "action": "draw",
+                    "from": f"input-page-{page_idx}-container",
+                    "to": f"frame-{i}-container",
+                    "id": arrow_id
+                }]
+                
+                record(highlight=(("input_pages", page_idx, "all"),
+                                ("frames", i, "all")),
+                                arrows=arrow_info,
+                                log_message=f"Input {page_idx + 1} loaded in frame {i + 1}.")
+            
+            # Create a single array combining all elements from loaded frames
+            combined_elements = []
+            for i in range(current_group_size):
+                combined_elements.extend(frames[i])
+            
+            # Perform bubble sort on the combined array with visualization
+            total_elements = len(combined_elements)
+            for i in range(total_elements):
+                for j in range(total_elements - i - 1):
+                    if combined_elements[j] > combined_elements[j + 1]:
+                        combined_elements[j], combined_elements[j + 1] = combined_elements[j + 1], combined_elements[j]
+                        
+                        # Update frames to reflect the swap
+                        # Determine which frames and positions correspond to indices j and j+1
+                        frame_j = j // elements_per_page
+                        pos_j = j % elements_per_page
+                        frame_j1 = (j + 1) // elements_per_page
+                        pos_j1 = (j + 1) % elements_per_page
+                        
+                        if frame_j < current_group_size and frame_j1 < current_group_size:
+                            frames[frame_j][pos_j], frames[frame_j1][pos_j1] = frames[frame_j1][pos_j1], frames[frame_j][pos_j]
+                            record(highlight=(("frames", frame_j, pos_j), ("frames", frame_j1, pos_j1)))
+            
+            # Write sorted frames back to output pages
+            for i in range(current_group_size):
+                page_idx = group_start + i
+                output_pages[page_idx] = copy.deepcopy(frames[i])
+                n_accesses += 1
+                
+                # Remove input arrow and add output arrow
+                arrow_remove_input = [{
+                    "action": "remove",
+                    "id": current_arrows[i]
+                }]
+                
+                arrow_to_output = [{
+                    "action": "draw",
+                    "from": f"frame-{i}-container",
+                    "to": f"output-page-{page_idx}-container",
+                    "id": f"arrow-frame-{i}-output-page-{page_idx}"
+                }]
+                
+                record(highlight=(("frames", i, "all"),
+                                ("output_pages", page_idx, "all")),
+                                arrows=arrow_remove_input + arrow_to_output,
+                                log_message=f"Frame {i + 1} written to output {page_idx + 1}.")
+                
+                # Remove output arrow
+                arrow_remove_output = [{
+                    "action": "remove",
+                    "id": f"arrow-frame-{i}-output-page-{page_idx}"
+                }]
+                record(arrows=arrow_remove_output)
 
-       if pass_num == n_passes:  # final pass
-           for i in range(len(output_pages)):
-               output_run_assignments[i] = 1
-       else:
-           next_runs_size = k ** pass_num
-           for i in range(len(output_pages)):
-               output_run_assignments[i] = (i // next_runs_size) + 1
 
-       run_info = {
-           'input': input_run_assignments,
-           'output': output_run_assignments
-       }
+    record(log_message="Pass 0 completed.")
 
-       record(log_message=f"Starting Pass {pass_num}.", swap=pass_num, memory_run_info=run_info)
+    # merge passes
+    k = n_frames - 1
 
-       # divide into runs
-       runs = [input_pages[i:i + old_runs_size] for i in range(0, len(input_pages), old_runs_size)]
+    if sort_page_by_page:
+        old_runs_size = 1
+    
+    else:
+        old_runs_size = n_frames
+    
+    current_runs_size = old_runs_size
+    pass_num = 0
 
-       # divide into executions
-       executions = [runs[i:i + k] for i in range(0, len(runs), k)]
+    while current_runs_size < n_pages:
+        current_runs_size *= k
+        pass_num += 1
 
-       output_page_idx = 0
+        # swap input and output secondary memory
+        input_pages, output_pages = output_pages, input_pages
 
-       # perform each execution
-       for exec_idx, execution in enumerate(executions):
-           record(log_message=f"Starting Run {exec_idx+1}.")
+        # reset output page
+        output_pages = [[0] * elements_per_page for _ in range(n_pages)]
 
-           run_info = {}
-           run_info[k] = "output"
+        # Calculate run assignments for this pass
+        input_run_assignments = {}
+        output_run_assignments = {}
 
-           for frame in range(n_frames-1):
-               run_info[frame] = k * exec_idx + frame + 1
+        for i in range(len(input_pages)):
+            input_run_assignments[i] = (i // old_runs_size) + 1
 
-           record(buffer_run_info=run_info)
+        for i in range(len(output_pages)):
+            output_run_assignments[i] = (i // current_runs_size) + 1
 
-           # Initialize frame pointers and page pointers for each run
-           frame_pointers = [0] * len(execution)  # Points to current element in each frame
-           page_pointers = [0] * len(execution)   # Points to current page in each run
-           output_frame_pointer = 0
-           
-           # Track current arrow IDs for each frame
-           current_arrow_ids = [None] * len(execution)
-           
-           # Initialize output frame with zeros
-           frames[-1] = [0] * elements_per_page
-           
-           # load first page of each run into buffer frames
-           for j in range(len(execution)):
-               frames[j] = copy.deepcopy(execution[j][0])
-               n_accesses += 1
-               
-               # Calculate the global page index for the first page of this run
-               global_page_idx = exec_idx * k * old_runs_size + j * old_runs_size
-               current_arrow_ids[j] = f"arrow-input-page-{global_page_idx}-frame-{j}"
+        run_info = {
+            'input': input_run_assignments,
+            'output': output_run_assignments
+        }
 
-               arrow_info = [{
-                   "action": "draw",
-                   "from": f"input-page-{global_page_idx}-container",
-                   "to": f"frame-{j}-container",
-                   "id": current_arrow_ids[j]
-               }]
+        record(log_message=f"Starting Pass {pass_num}.", swap=pass_num, memory_run_info=run_info)
 
-               record(highlight=(("input_pages", global_page_idx, "all"),
-                               ("frames", j, "all")),
-                               arrows=arrow_info,
-                               log_message=f"Input {global_page_idx + 1} loaded in frame {j + 1}.")
+        # divide into runs
+        runs = [input_pages[i:i + old_runs_size] for i in range(0, len(input_pages), old_runs_size)]
 
-           # perform merging pass
-           # until there are no more elements left in any frame
-           while any(frame_pointers[i] < len(frames[i]) or 
+        # divide into executions
+        executions = [runs[i:i + k] for i in range(0, len(runs), k)]
+
+        output_page_idx = 0
+
+        # perform each execution
+        for exec_idx, execution in enumerate(executions):
+            record(log_message=f"Starting Run {exec_idx+1}.")
+
+            run_info = {}
+            run_info[k] = "output"
+
+            for frame in range(n_frames-1):
+                run_info[frame] = k * exec_idx + frame + 1
+
+            record(buffer_run_info=run_info)
+
+            # Initialize frame pointers and page pointers for each run
+            frame_pointers = [0] * len(execution)  # Points to current element in each frame
+            page_pointers = [0] * len(execution)   # Points to current page in each run
+            output_frame_pointer = 0
+            
+            # Track current arrow IDs for each frame
+            current_arrow_ids = [None] * len(execution)
+            
+            # Initialize output frame with zeros
+            frames[-1] = [0] * elements_per_page
+            
+            # load first page of each run into buffer frames
+            for j in range(len(execution)):
+                frames[j] = copy.deepcopy(execution[j][0])
+                n_accesses += 1
+                
+                # Calculate the global page index for the first page of this run
+                global_page_idx = exec_idx * k * old_runs_size + j * old_runs_size
+                current_arrow_ids[j] = f"arrow-input-page-{global_page_idx}-frame-{j}"
+
+                arrow_info = [{
+                    "action": "draw",
+                    "from": f"input-page-{global_page_idx}-container",
+                    "to": f"frame-{j}-container",
+                    "id": current_arrow_ids[j]
+                }]
+
+                record(highlight=(("input_pages", global_page_idx, "all"),
+                                ("frames", j, "all")),
+                                arrows=arrow_info,
+                                log_message=f"Input {global_page_idx + 1} loaded in frame {j + 1}.")
+
+            # perform merging pass
+            # until there are no more elements left in any frame
+            while any(frame_pointers[i] < len(frames[i]) or 
                     page_pointers[i] < len(execution[i]) - 1 
                     for i in range(len(execution))):
 
-               # find minimum between first non-processed element of each input frame
-               min_val = float('inf')
-               min_frame = -1
-               
-               for i in range(len(execution)):
-                   if frame_pointers[i] < len(frames[i]) and frames[i][frame_pointers[i]] != 0:
-                       if frames[i][frame_pointers[i]] < min_val:
-                           min_val = frames[i][frame_pointers[i]]
-                           min_frame = i
+                # find minimum between first non-processed element of each input frame
+                min_val = float('inf')
+                min_frame = -1
+                
+                for i in range(len(execution)):
+                    if frame_pointers[i] < len(frames[i]) and frames[i][frame_pointers[i]] != 0:
+                        if frames[i][frame_pointers[i]] < min_val:
+                            min_val = frames[i][frame_pointers[i]]
+                            min_frame = i
 
-               if min_frame == -1:
-                   break
+                if min_frame == -1:
+                    break
 
-               # write minimum in the output frame and mark as processed in input frame
-               frames[-1][output_frame_pointer] = min_val
-               output_frame_pointer += 1
-               
-               record(highlight=(("frames", min_frame, frame_pointers[min_frame]),
-                               ("frames", n_frames-1, output_frame_pointer-1)))
-               
-               frames[min_frame][frame_pointers[min_frame]] = 0
-               frame_pointers[min_frame] += 1
+                # write minimum in the output frame and mark as processed in input frame
+                frames[-1][output_frame_pointer] = min_val
+                output_frame_pointer += 1
+                
+                record(highlight=(("frames", min_frame, frame_pointers[min_frame]),
+                                ("frames", n_frames-1, output_frame_pointer-1)))
+                
+                frames[min_frame][frame_pointers[min_frame]] = 0
+                frame_pointers[min_frame] += 1
 
-               # if output frame is full write it in the output secondary memory and empty it
-               if output_frame_pointer == elements_per_page:
-                   output_pages[output_page_idx] = copy.deepcopy(frames[-1])
-                   n_accesses += 1
-                   
-                   arrow_to_output = [{
-                       "action": "draw",
-                       "from": f"frame-{n_frames-1}-container",
-                       "to": f"output-page-{output_page_idx}-container",
-                       "id": f"arrow-output-frame-page-{output_page_idx}"
-                   }]
-                   
-                   record(highlight=(("frames", n_frames-1, "all"),
-                                   ("output_pages", output_page_idx, "all")),
-                          arrows=arrow_to_output,
-                          log_message=f"Output page {output_page_idx + 1} written.")
-                   
-                   arrow_remove_output = [{
-                       "action": "remove",
-                       "id": f"arrow-output-frame-page-{output_page_idx}"
-                   }]
-                   record(arrows=arrow_remove_output)
-                   
-                   # Reset output frame with zeros
-                   frames[-1] = [0] * elements_per_page
-                   output_frame_pointer = 0
-                   output_page_idx += 1
+                # if output frame is full write it in the output secondary memory and empty it
+                if output_frame_pointer == elements_per_page:
+                    output_pages[output_page_idx] = copy.deepcopy(frames[-1])
+                    n_accesses += 1
+                    
+                    arrow_to_output = [{
+                        "action": "draw",
+                        "from": f"frame-{n_frames-1}-container",
+                        "to": f"output-page-{output_page_idx}-container",
+                        "id": f"arrow-output-frame-page-{output_page_idx}"
+                    }]
+                    
+                    record(highlight=(("frames", n_frames-1, "all"),
+                                    ("output_pages", output_page_idx, "all")),
+                            arrows=arrow_to_output,
+                            log_message=f"Output page {output_page_idx + 1} written.")
+                    
+                    arrow_remove_output = [{
+                        "action": "remove",
+                        "id": f"arrow-output-frame-page-{output_page_idx}"
+                    }]
+                    record(arrows=arrow_remove_output)
+                    
+                    # Reset output frame with zeros
+                    frames[-1] = [0] * elements_per_page
+                    output_frame_pointer = 0
+                    output_page_idx += 1
 
-               # if an input frame is exhausted, load next page of the same run
-               if frame_pointers[min_frame] >= len(frames[min_frame]):
-                   if page_pointers[min_frame] < len(execution[min_frame]) - 1:
-                       page_pointers[min_frame] += 1
-                       page_in_run = page_pointers[min_frame]
-                       global_page_idx = exec_idx * k * old_runs_size + min_frame * old_runs_size + page_in_run
-                       
-                       if global_page_idx < len(input_pages):
-                           frames[min_frame] = copy.deepcopy(execution[min_frame][page_in_run])
-                           n_accesses += 1
-                           frame_pointers[min_frame] = 0
-                           
-                           # Remove the current arrow using the tracked ID
-                           arrow_remove_old = [{
-                               "action": "remove",
-                               "id": current_arrow_ids[min_frame]
-                           }]
-                           
-                           # Create new arrow and update the tracked ID
-                           new_arrow_id = f"arrow-input-page-{global_page_idx}-frame-{min_frame}"
-                           current_arrow_ids[min_frame] = new_arrow_id
-                           
-                           arrow_new = [{
-                               "action": "draw",
-                               "from": f"input-page-{global_page_idx}-container",
-                               "to": f"frame-{min_frame}-container",
-                               "id": new_arrow_id
-                           }]
-                           
-                           record(highlight=(("input_pages", global_page_idx, "all"),
-                                           ("frames", min_frame, "all")),
-                                  arrows=arrow_remove_old + arrow_new,
-                                  log_message=f"Input {global_page_idx + 1} loaded in frame {min_frame + 1}.")
+                # if an input frame is exhausted, load next page of the same run
+                if frame_pointers[min_frame] >= len(frames[min_frame]):
+                    if page_pointers[min_frame] < len(execution[min_frame]) - 1:
+                        page_pointers[min_frame] += 1
+                        page_in_run = page_pointers[min_frame]
+                        global_page_idx = exec_idx * k * old_runs_size + min_frame * old_runs_size + page_in_run
+                        
+                        if global_page_idx < len(input_pages):
+                            frames[min_frame] = copy.deepcopy(execution[min_frame][page_in_run])
+                            n_accesses += 1
+                            frame_pointers[min_frame] = 0
+                            
+                            # Remove the current arrow using the tracked ID
+                            arrow_remove_old = [{
+                                "action": "remove",
+                                "id": current_arrow_ids[min_frame]
+                            }]
+                            
+                            # Create new arrow and update the tracked ID
+                            new_arrow_id = f"arrow-input-page-{global_page_idx}-frame-{min_frame}"
+                            current_arrow_ids[min_frame] = new_arrow_id
+                            
+                            arrow_new = [{
+                                "action": "draw",
+                                "from": f"input-page-{global_page_idx}-container",
+                                "to": f"frame-{min_frame}-container",
+                                "id": new_arrow_id
+                            }]
+                            
+                            record(highlight=(("input_pages", global_page_idx, "all"),
+                                            ("frames", min_frame, "all")),
+                                    arrows=arrow_remove_old + arrow_new,
+                                    log_message=f"Input {global_page_idx + 1} loaded in frame {min_frame + 1}.")
 
-           # write remaining elements in output frame if any
-           if output_frame_pointer > 0:
-               output_pages[output_page_idx] = copy.deepcopy(frames[-1])
-               n_accesses += 1
-               
-               arrow_to_output = [{
-                   "action": "draw",
-                   "from": f"frame-{n_frames-1}-container",
-                   "to": f"output-page-{output_page_idx}-container",
-                   "id": f"arrow-output-frame-page-{output_page_idx}"
-               }]
-               
-               record(highlight=(("frames", n_frames-1, "all"),
-                               ("output_pages", output_page_idx, "all")),
-                      arrows=arrow_to_output,
-                      log_message=f"Final output page {output_page_idx + 1} written.")
-               
-               arrow_remove_output = [{
-                   "action": "remove",
-                   "id": f"arrow-output-frame-page-{output_page_idx}"
-               }]
-               record(arrows=arrow_remove_output)
-               
-               output_page_idx += 1
+            # write remaining elements in output frame if any
+            if output_frame_pointer > 0:
+                output_pages[output_page_idx] = copy.deepcopy(frames[-1])
+                n_accesses += 1
+                
+                arrow_to_output = [{
+                    "action": "draw",
+                    "from": f"frame-{n_frames-1}-container",
+                    "to": f"output-page-{output_page_idx}-container",
+                    "id": f"arrow-output-frame-page-{output_page_idx}"
+                }]
+                
+                record(highlight=(("frames", n_frames-1, "all"),
+                                ("output_pages", output_page_idx, "all")),
+                        arrows=arrow_to_output,
+                        log_message=f"Final output page {output_page_idx + 1} written.")
+                
+                arrow_remove_output = [{
+                    "action": "remove",
+                    "id": f"arrow-output-frame-page-{output_page_idx}"
+                }]
+                record(arrows=arrow_remove_output)
+                
+                output_page_idx += 1
 
-           # remove all remaining input arrows for this execution
-           for j in range(len(execution)):
-               if current_arrow_ids[j]:  # Only remove if arrow exists
-                   arrow_remove = [{
-                       "action": "remove",
-                       "id": current_arrow_ids[j]
-                   }]
-                   record(arrows=arrow_remove)
+            # remove all remaining input arrows for this execution
+            for j in range(len(execution)):
+                if current_arrow_ids[j]:  # Only remove if arrow exists
+                    arrow_remove = [{
+                        "action": "remove",
+                        "id": current_arrow_ids[j]
+                    }]
+                    record(arrows=arrow_remove)
 
-           record(log_message=f"Run {exec_idx+1} completed.")
+            record(log_message=f"Run {exec_idx+1} completed.")
 
-       record(log_message=f"Pass {pass_num} completed.")
+        # update next run size
+        old_runs_size = current_runs_size
 
-   record(log_message="Sorting completed.")
+        record(log_message=f"Pass {pass_num} completed.")
 
-   record(log_message="‎")
-   record(log_message=f"Total passes: {pass_num}.")
-   record(log_message=f"Total memory accesses: {n_accesses}.")
 
-   callback(steps)
+    record(log_message="Sorting completed.")
+
+    record(log_message="‎")
+    record(log_message=f"Passes: {pass_num} (+ sort pass).")
+    record(log_message=f"Memory accesses: {n_accesses}.")
+
+    callback(steps)
 
 
 ###############
