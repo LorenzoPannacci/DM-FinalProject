@@ -11,14 +11,15 @@ def create_bars(input_pages, output_pages, frames):
     """
     Create bars for external sorting with separate input and output secondary memory.
     """
+
     container = document["container"]
     container.clear()
     container.style["backgroundColor"] = "#e0f7fa"
     
-    # Clear existing arrows
+    # clear existing arrows
     clear_all_arrows()
 
-    # Calculate max value for scaling
+    # calculate max value for scaling
     all_values = []
     for page in input_pages:
         all_values.extend(page)
@@ -31,34 +32,34 @@ def create_bars(input_pages, output_pages, frames):
 
     max_val = max(all_values) if all_values else 1
 
-    # Create input secondary memory section
+    # create input secondary memory section
     input_elements = []
     for i, page in enumerate(input_pages):
         input_elements.append(render_array(page, f"Page {i+1}", f"input-page-{i}", max_val))
 
     input_secondary_memory_section = create_section("Secondary Memory - Input Pass 0", input_elements)
 
-    # Create output secondary memory section
+    # create output secondary memory section
     output_elements = []
     for i, page in enumerate(output_pages):
         output_elements.append(render_array(page, f"Page {i+1}", f"output-page-{i}", max_val))
 
     output_secondary_memory_section = create_section("Secondary Memory - Output Pass 0", output_elements)
 
-    # Create buffer section
+    # create buffer section
     buffer_elements = []
     for i, frame in enumerate(frames):
         buffer_elements.append(render_array(frame, f"Frame {i+1}", f"frame-{i}", max_val))
 
     buffer_section = create_section("Buffer", buffer_elements)
 
-    # Create flexible layout with buffer in the middle
+    # create flexible layout with buffer in the middle
     layout = html.DIV(Class="memory-layout")
     layout <= input_secondary_memory_section
     layout <= buffer_section
     layout <= output_secondary_memory_section
 
-    # Add arrow layer
+    # add arrow layer
     svg = create_arrow_layer()
     
     container <= layout
@@ -66,9 +67,13 @@ def create_bars(input_pages, output_pages, frames):
 
 
 def update_bars(state, highlight=set()):
+    """
+    Handle updates for all the bars.
+    """
+
     expanded_highlight = preprocess_highlight(state, highlight)
     
-    # Calculate max value for consistent scaling
+    # calculate max value for consistent scaling
     all_values = []
     for section, arrays in state.items():
         for arr in arrays:
@@ -116,6 +121,9 @@ def update_bars(state, highlight=set()):
 
 
 def animate(steps):
+    """
+    Handles all animation steps
+    """
 
     i = 0
 
@@ -174,7 +182,7 @@ def animate(steps):
                                 if label_element:
                                     label_element.innerHTML = f"Page {page_idx+1} (Run {run_num})"
 
-                    create_run_outlines(state, memory_run_info)
+                    create_run_outlines(memory_run_info)
                 
                 if buffer_run_info:
                     for frame_idx, run_num in buffer_run_info.items():
@@ -218,6 +226,9 @@ def animate(steps):
 
 
 def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, elements_per_page, callback):
+    """
+    Performs k-way merge sort and records every step for animation.
+    """
 
     steps = []
     frames = [[] for _ in range(n_frames)]
@@ -239,7 +250,7 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
                         memory_run_info,
                         buffer_run_info))
 
-    # Check if sorting page-by-page
+    # check if sorting page-by-page
     sort_page_by_page = document["sort_page_by_page"].checked
 
     if sort_page_by_page:
@@ -311,7 +322,7 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
 
         record(log_message="Pass 0: fill buffer and perform in-place sort.", memory_run_info=run_info)
         
-        # Process pages in groups
+        # process pages in groups
         for group_start in range(0, n_pages, n_frames):
             group_end = min(group_start + n_frames, n_pages)
             current_group_size = group_end - group_start
@@ -338,20 +349,20 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
                                 arrows=arrow_info,
                                 log_message=f"Input {page_idx + 1} loaded in frame {i + 1}.")
             
-            # Create a single array combining all elements from loaded frames
+            # create a single array combining all elements from loaded frames
             combined_elements = []
             for i in range(current_group_size):
                 combined_elements.extend(frames[i])
             
-            # Perform bubble sort on the combined array with visualization
+            # perform bubble sort on the combined array with visualization
             total_elements = len(combined_elements)
             for i in range(total_elements):
                 for j in range(total_elements - i - 1):
                     if combined_elements[j] > combined_elements[j + 1]:
                         combined_elements[j], combined_elements[j + 1] = combined_elements[j + 1], combined_elements[j]
                         
-                        # Update frames to reflect the swap
-                        # Determine which frames and positions correspond to indices j and j+1
+                        # update frames to reflect the swap
+                        # determine which frames and positions correspond to indices j and j+1
                         frame_j = j // elements_per_page
                         pos_j = j % elements_per_page
                         frame_j1 = (j + 1) // elements_per_page
@@ -361,13 +372,13 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
                             frames[frame_j][pos_j], frames[frame_j1][pos_j1] = frames[frame_j1][pos_j1], frames[frame_j][pos_j]
                             record(highlight=(("frames", frame_j, pos_j), ("frames", frame_j1, pos_j1)))
             
-            # Write sorted frames back to output pages
+            # write sorted frames back to output pages
             for i in range(current_group_size):
                 page_idx = group_start + i
                 output_pages[page_idx] = copy.deepcopy(frames[i])
                 n_accesses += 1
                 
-                # Remove input arrow and add output arrow
+                # remove input arrow and add output arrow
                 arrow_remove_input = [{
                     "action": "remove",
                     "id": current_arrows[i]
@@ -385,7 +396,7 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
                                 arrows=arrow_remove_input + arrow_to_output,
                                 log_message=f"Frame {i + 1} written to output {page_idx + 1}.")
                 
-                # Remove output arrow
+                # remove output arrow
                 arrow_remove_output = [{
                     "action": "remove",
                     "id": f"arrow-frame-{i}-output-page-{page_idx}"
@@ -455,15 +466,15 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
 
             record(buffer_run_info=run_info)
 
-            # Initialize frame pointers and page pointers for each run
+            # initialize frame pointers and page pointers for each run
             frame_pointers = [0] * len(execution)  # Points to current element in each frame
             page_pointers = [0] * len(execution)   # Points to current page in each run
             output_frame_pointer = 0
             
-            # Track current arrow IDs for each frame
+            # track current arrow IDs for each frame
             current_arrow_ids = [None] * len(execution)
             
-            # Initialize output frame with zeros
+            # initialize output frame with zeros
             frames[-1] = [0] * elements_per_page
             
             # load first page of each run into buffer frames
@@ -471,7 +482,7 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
                 frames[j] = copy.deepcopy(execution[j][0])
                 n_accesses += 1
                 
-                # Calculate the global page index for the first page of this run
+                # calculate the global page index for the first page of this run
                 global_page_idx = exec_idx * k * old_runs_size + j * old_runs_size
                 current_arrow_ids[j] = f"arrow-input-page-{global_page_idx}-frame-{j}"
 
@@ -540,7 +551,7 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
                     
                     record(arrows=arrow_remove_output)
                     
-                    # Reset output frame with zeros
+                    # reset output frame with zeros
                     frames[-1] = [0] * elements_per_page
                     output_frame_pointer = 0
                     output_page_idx += 1
@@ -557,13 +568,13 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
                             n_accesses += 1
                             frame_pointers[min_frame] = 0
                             
-                            # Remove the current arrow using the tracked ID
+                            # remove the current arrow using the tracked ID
                             arrow_remove_old = [{
                                 "action": "remove",
                                 "id": current_arrow_ids[min_frame]
                             }]
                             
-                            # Create new arrow and update the tracked ID
+                            # create new arrow and update the tracked ID
                             new_arrow_id = f"arrow-input-page-{global_page_idx}-frame-{min_frame}"
                             current_arrow_ids[min_frame] = new_arrow_id
                             
@@ -620,11 +631,11 @@ def k_way_merge_sort(input_pages, output_pages, frames, n_pages, n_frames, eleme
 
         record(log_message=f"Pass {pass_num} completed.")
 
-
+    # logs at end of sorting
     record(log_message="Sorting completed.")
-
     record(log_message="‎")
     record(log_message=f"Passes: {pass_num} (+ sort pass).")
     record(log_message=f"Memory accesses: {n_accesses}.")
 
+    # animate all recorded steps
     callback(steps)

@@ -6,6 +6,11 @@ import random
 
 
 def get_manual_inputs():
+    """
+    Function that extracts the values inserted in the text boxes for when
+    the user manually populate the input pages.
+    """
+
     n_pages = int(document["n_pages"].value)
     pages = []
 
@@ -32,6 +37,11 @@ def get_manual_inputs():
 
 
 def on_sort_trigger(ev):
+    """
+    Function that handles the pressing of the "Run" button on the webpage and
+    starts the sorting animation.
+    """
+
     method = document["sortMethod"].value
     document.getElementById("console").innerHTML = ""
 
@@ -55,7 +65,7 @@ def on_sort_trigger(ev):
 
         if not document["manual_populate"].checked:
             input_pages = []
-            for i in range(n_pages, 0, -1):
+            for _ in range(n_pages, 0, -1):
                 page = [random.randint(1, elements_per_page * n_pages * 10) for _ in range(elements_per_page)]
                 input_pages.append(page)
 
@@ -64,7 +74,7 @@ def on_sort_trigger(ev):
             if not input_pages:
                 return
 
-        # Initialize output pages with same structure as input but empty values
+        # initialize output pages with same structure as input but empty values
         output_pages = [[0] * elements_per_page for _ in range(n_pages)]
         frames = [[0] * elements_per_page for _ in range(n_frames)]
         
@@ -83,7 +93,7 @@ def on_sort_trigger(ev):
         if method == "bubble":
             main_create_bars(arr)
             main_bubble_sort(arr, main_animate)
-            
+
         elif method == "insertion":
             main_create_bars(arr)
             main_insertion_sort(arr, main_animate)

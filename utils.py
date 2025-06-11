@@ -7,6 +7,12 @@ current_arrows = {}
 
 
 def preprocess_highlight(state, highlight):
+    """
+    Preprocessing of the highligth element. If the highlight is over
+    all the bars of a section the single event with tag 'all' is
+    converted into multiple events, one for each bar.
+    """
+
     expanded_highlight = set()
 
     for section, arrays in state.items():
@@ -25,7 +31,11 @@ def preprocess_highlight(state, highlight):
     return expanded_highlight
 
 
-def create_section(title_text, content_elements, height_px=None):
+def create_section(title_text, content_elements):
+    """
+    Function that creates a new section in the animation and populates it.
+    """
+
     section = html.DIV(Class="section")
     title = html.H3(title_text, Class="section-title")
 
@@ -37,7 +47,11 @@ def create_section(title_text, content_elements, height_px=None):
     return section
 
 
-def render_array(arr, label, base_id, max_val, run_info=None):
+def render_array(arr, label, base_id, max_val):
+    """
+    Function that handles the animation of a set of bars.
+    """
+
     array_container = html.DIV(Class="array-container")
     array_container.id = f"{base_id}-container"
     
@@ -45,11 +59,13 @@ def render_array(arr, label, base_id, max_val, run_info=None):
         array_label = html.DIV(label, Class="array-label")
         array_container <= array_label
 
-    # Calculate width and spacing as percentage of container
+    # calculate width and spacing as percentage of container
     num_bars = len(arr)
     if num_bars > 0:
-        bar_width_percent = 80 / num_bars  # Use 80% of container, leaving 20% for spacing
-        spacing_percent = 20 / (num_bars + 1)  # Distribute remaining 20% as spacing
+        # use 80% of container, leaving 20% for spacing
+        bar_width_percent = 80 / num_bars
+        # distribute remaining 20% as spacing
+        spacing_percent = 20 / (num_bars + 1)
 
     else:
         bar_width_percent = 0
@@ -69,7 +85,7 @@ def render_array(arr, label, base_id, max_val, run_info=None):
             id=f"{base_id}-bar-{i}"
         )
 
-        # Add text element for the value
+        # add text element for the value
         bar_text = html.DIV(
             str(val) if val != 0 else "",
             Class="bar-text",
@@ -83,12 +99,15 @@ def render_array(arr, label, base_id, max_val, run_info=None):
 
 
 def create_arrow_layer():
-    """Create SVG layer for arrows"""
+    """
+    Create SVG layer for arrows
+    """
+
     svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
     svg.setAttribute("class", "arrow-svg")
     svg.id = "arrowLayer"
     
-    # Create defs for arrowhead marker
+    # create defs for arrowhead marker
     defs = document.createElementNS("http://www.w3.org/2000/svg", "defs")
     marker = document.createElementNS("http://www.w3.org/2000/svg", "marker")
     marker.setAttribute("id", "arrowhead")
@@ -110,7 +129,10 @@ def create_arrow_layer():
 
 
 def draw_arrow(from_id, to_id, arrow_id):
-    """Draw arrow between two elements"""
+    """
+    Draw arrow between two elements
+    """
+
     from_el = document.getElementById(from_id)
     to_el = document.getElementById(to_id)
     
@@ -121,26 +143,26 @@ def draw_arrow(from_id, to_id, arrow_id):
     if not svg:
         return
     
-    # Remove existing arrow if it exists
+    # remove existing arrow if it exists
     existing_arrow = document.getElementById(arrow_id)
     if existing_arrow:
         existing_arrow.remove()
     
-    # Get container bounds for relative positioning
+    # get container bounds for relative positioning
     container = document.getElementById("container")
     container_rect = container.getBoundingClientRect()
     
-    # Get element bounds
+    # get element bounds
     from_rect = from_el.getBoundingClientRect()
     to_rect = to_el.getBoundingClientRect()
     
-    # Calculate relative positions
+    # calculate relative positions
     x1 = from_rect.left - container_rect.left + from_rect.width
     y1 = from_rect.top - container_rect.top + from_rect.height / 2
     x2 = to_rect.left - container_rect.left
     y2 = to_rect.top - container_rect.top + to_rect.height / 2
     
-    # Create arrow line
+    # create arrow line
     line = document.createElementNS("http://www.w3.org/2000/svg", "line")
     line.setAttribute("id", arrow_id)
     line.setAttribute("x1", str(x1))
@@ -157,14 +179,20 @@ def draw_arrow(from_id, to_id, arrow_id):
 
 
 def remove_arrow(arrow_id):
-    """Remove an arrow"""
+    """
+    Remove an arrow
+    """
+
     if arrow_id in current_arrows:
         current_arrows[arrow_id].remove()
         del current_arrows[arrow_id]
 
 
 def clear_all_arrows():
-    """Clear all arrows"""
+    """
+    Clear all arrows
+    """
+
     for arrow_id in list(current_arrows.keys()):
         remove_arrow(arrow_id)
 
@@ -174,23 +202,30 @@ def log_to_console(message, newline=True):
     Log a message to the console display.
     If newline=False, the message will be added to the current line.
     """
+
     console = document["console"]
     if newline:
         console.innerHTML += f"<div>{message}</div>"
+
     else:
         # Get the last div or create one if none exists
         divs = console.querySelectorAll("div")
         if divs.length > 0:
             last_div = divs[divs.length - 1]
             last_div.innerHTML += f" {message}"
+
         else:
             console.innerHTML += f"<div>{message}</div>"
+
     console.scrollTop = console.scrollHeight
 
 
-def create_run_outlines(state, memory_run_info):
-    """Create outlined boxes around pages belonging to the same run"""
-    # Clear existing outlines
+def create_run_outlines(memory_run_info):
+    """
+    Create outlined boxes around pages belonging to the same run
+    """
+
+    # clear existing outlines
     existing_outlines = document.querySelectorAll('.run-outline')
     for outline in existing_outlines:
         outline.remove()
@@ -206,17 +241,20 @@ def create_run_outlines(state, memory_run_info):
             
         run_assignments = memory_run_info[section_type]
         
-        # Group pages by run number
+        # group pages by run number
         runs = {}
         for page_idx, run_num in run_assignments.items():
             if run_num not in runs:
                 runs[run_num] = []
             runs[run_num].append(page_idx)
         
-        # Create outline for each run with multiple pages
+        # create outline for each run with multiple pages
         for run_num, page_indices in runs.items():
-            if len(page_indices) > 1:  # Only outline runs with multiple pages
-                # Find the bounding box of all pages in this run
+            
+            # only outline runs with multiple pages
+            if len(page_indices) > 1:
+
+                # find the bounding box of all pages in this run
                 first_page_idx = min(page_indices)
                 last_page_idx = max(page_indices)
                 
@@ -224,18 +262,18 @@ def create_run_outlines(state, memory_run_info):
                 last_container = document.getElementById(f"{section_type}-page-{last_page_idx}-container")
                 
                 if first_container and last_container:
-                    # Get positions relative to the main container
+                    # get positions relative to the main container
                     container_rect = container.getBoundingClientRect()
                     first_rect = first_container.getBoundingClientRect()
                     last_rect = last_container.getBoundingClientRect()
                     
-                    # Calculate outline dimensions
+                    # calculate outline dimensions
                     left = first_rect.left - container_rect.left - 10
                     top = first_rect.top - container_rect.top - 10
                     right = last_rect.right - container_rect.left + 10
                     bottom = last_rect.bottom - container_rect.top + 10
                     
-                    # Create outline element
+                    # create outline element
                     outline = html.DIV(Class="run-outline")
                     outline.style.left = f"{left}px"
                     outline.style.top = f"{top}px"

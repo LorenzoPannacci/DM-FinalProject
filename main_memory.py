@@ -63,6 +63,9 @@ def main_update_bars(arr, highlight=[]):
 
 
 def main_animate(steps):
+    """
+    Handles animation steps for main memory sorting.
+    """
 
     i = 0
 
@@ -101,6 +104,7 @@ def main_bubble_sort(arr, callback):
     """
     Main memory Bubblesort
     """
+    
     steps = []
 
     def record(a, highlight=[], log_message=None):
